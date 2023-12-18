@@ -1,0 +1,21 @@
+{
+  "name": "skin-food-shop",
+  "version": "1.0.0",
+  "description": "31/12 submit",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongoose": "^8.0.3",
+    "nodemon": "^3.0.2"
+  }
+}
