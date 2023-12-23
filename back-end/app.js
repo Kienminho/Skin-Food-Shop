@@ -1,10 +1,16 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
+const cookieParser = require("cookie-parser");
+
+const Product = require("./models/Product");
+const Category = require("./models/Category");
+const CapacityPrice = require("./models/CapacityPrice");
 require("dotenv").config();
 const app = express();
 
 //middleware
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   session({
@@ -17,8 +23,12 @@ app.use(
     },
   })
 );
+app.use(express.static("public"));
 app.use(cookieParser());
 
+//routes
+const apiRouter = require("./router/userRouter");
+app.use("/api", apiRouter);
 app.listen(process.env.PORT, () => {
-  console.log("Server is running on: http://localhost: " + process.env.PORT);
+  console.log("Server is running on: http://localhost:" + process.env.PORT);
 });
