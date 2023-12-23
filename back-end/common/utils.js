@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 const message = {
   SUCCESS: "Successful",
   ERROR: "Error",
@@ -16,7 +18,7 @@ const getUserNameByEmail = (email) => {
   return email.substring(0, index);
 };
 
-const createResponseModel = (code, message, data) => {
+const createResponseModel = (code, message, data = null) => {
   return {
     statusCode: code,
     message: message,
@@ -34,13 +36,23 @@ const createSuccessResponseModel = (totalRecord = 1, data) => {
   };
 };
 
-const createErrorResponseModel = (totalRecord = 0, data = false) => {
+const createErrorResponseModel = (message, data = false) => {
   return {
-    statusCode: 404,
-    message: "Failed",
-    totalRecord: totalRecord,
+    statusCode: 400,
+    message: message,
+    totalRecord: 0,
     data: data,
   };
+};
+
+const hashPassword = (password) => {
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password, salt);
+  return hash;
+};
+
+const validatePassword = async (password, hashPassword) => {
+  return await bcrypt.compare(password, hashPassword);
 };
 
 const generateRandomToken = (length) => {
@@ -64,4 +76,6 @@ module.exports = {
   createSuccessResponseModel: createSuccessResponseModel,
   generateRandomToken: generateRandomToken,
   createErrorResponseModel: createErrorResponseModel,
+  validatePassword: validatePassword,
+  hashPassword: hashPassword,
 };
