@@ -3,9 +3,6 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 
-const Product = require("./models/Product");
-const Category = require("./models/Category");
-const CapacityPrice = require("./models/CapacityPrice");
 require("dotenv").config();
 const app = express();
 
@@ -28,7 +25,11 @@ app.use(cookieParser());
 
 //routes
 const apiRouter = require("./router/userRouter");
-app.use("/api", apiRouter);
+const productRouter = require("./router/productRouter");
+const cartRouter = require("./router/cartRouter");
+app.use("/api/user", apiRouter);
+app.use("/api/product", productRouter);
+app.use("/api/cart", cartRouter);
 app.listen(process.env.PORT, () => {
   console.log("Server is running on: http://localhost:" + process.env.PORT);
 });

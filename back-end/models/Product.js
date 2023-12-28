@@ -4,7 +4,6 @@ const ProductSchema = new mongoose.Schema({
   productCode: {
     type: String,
     required: true,
-    unique: true,
   },
   name: {
     type: String,
@@ -19,6 +18,14 @@ const ProductSchema = new mongoose.Schema({
     required: true,
   },
   capacitiesAndPrices: [CapacityPrice.schema],
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

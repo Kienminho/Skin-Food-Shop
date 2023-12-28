@@ -27,7 +27,9 @@ const handleLogin = async (req, res) => {
   req.session.userName = user.userName;
   //create cookie
   res.cookie("user", user._id);
-  return res.json(Utils.createSuccessResponseModel(1, user._id));
+  return res.json(
+    Utils.createSuccessResponseModel(1, { Id: user._id, Role: user.role })
+  );
 };
 
 const handleRegister = async (req, res) => {
