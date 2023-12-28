@@ -9,7 +9,7 @@ const CategorySchema = new mongoose.Schema({
   },
   products: {
     type: [Product.schema],
-    required: true,
+    required: false,
   },
 });
 

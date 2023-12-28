@@ -3,9 +3,9 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 
 // router api user
-router.post("/user/login", userController.handleLogin);
-router.post("/user/register", userController.handleRegister);
-router.put("/user/update-info", userController.updateInfoUser);
-router.get("/user/get-info-mine", userController.getInfoMine);
-router.put("/user/change-password", userController.changePassword);
+router.post("/login", userController.handleLogin);
+router.post("/register", userController.handleRegister);
+router.put("/update-info", userController.updateInfoUser);
+router.get("/get-info-mine", userController.getInfoMine);
+router.put("/change-password", userController.changePassword);
 module.exports = router;
