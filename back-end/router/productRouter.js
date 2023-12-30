@@ -18,4 +18,10 @@ router.get("/get-product-detail/:id", productController.getProductDetail);
 
 //Get 5 products of the same category, not counting the current product
 router.get("/get-related-products/:id", productController.getRelatedProducts);
+
+router.post(
+  "/upload-image",
+  productController.upload.single("image"),
+  productController.uploadImage
+);
 module.exports = router;
