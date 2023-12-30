@@ -7,6 +7,7 @@ import ItemByCategory from "./pages/item-by-category";
 import Cart from "./pages/cart";
 import ProductDetail from "./pages/product-detail";
 import Tips from "./pages/tips";
+import Blogs from "./pages/blogs";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
   {
     path: "/tips",
     element: <Tips />,
+  },
+  {
+    path: "/blogs",
+    element: <Blogs />,
   },
 ]);
 
