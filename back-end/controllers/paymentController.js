@@ -19,7 +19,7 @@ const createPaymentIntent = async (req, res) => {
     } = req.body;
     //create invoice
     const invoice = new Invoice({
-      user: req.session.userId,
+      user: req.session.user,
       buyerName,
       address,
       phoneNumber,

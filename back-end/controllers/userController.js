@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Invoice = require("../models/Invoice");
 const Utils = require("../common/utils");
 
 const checkPermission = (req, res, next) => {
@@ -144,7 +145,21 @@ const changePassword = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({ role: { $ne: "admin" }, isDeleted: false });
-    return res.json(Utils.createSuccessResponseModel(users.length, users));
+
+    const usersWithTotalOrders = await Promise.all(
+      users.map(async (user) => {
+        const totalOrders = await Invoice.countDocuments({ user: user._id });
+        return { ...user.toObject(), totalOrders };
+      })
+    );
+    console.log(usersWithTotalOrders);
+
+    return res.json(
+      Utils.createSuccessResponseModel(
+        usersWithTotalOrders.length,
+        usersWithTotalOrders
+      )
+    );
   } catch (error) {
     console.log(error);
     return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
