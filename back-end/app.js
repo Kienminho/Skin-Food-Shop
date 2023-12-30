@@ -27,9 +27,11 @@ app.use(cookieParser());
 const apiRouter = require("./router/userRouter");
 const productRouter = require("./router/productRouter");
 const cartRouter = require("./router/cartRouter");
+const paymentRouter = require("./router/paymentRouter");
 app.use("/api/user", apiRouter);
 app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
+app.use("/api/payment", paymentRouter);
 app.listen(process.env.PORT, () => {
   console.log("Server is running on: http://localhost:" + process.env.PORT);
 });
