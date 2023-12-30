@@ -2,6 +2,9 @@ const multer = require("multer");
 const fs = require("fs");
 const Guid = require("guid");
 
+const Utils = require("../common/utils");
+const Product = require("../models/Product");
+const Category = require("../models/Category");
 //setup multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -21,9 +24,18 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-const Utils = require("../common/utils");
-const Product = require("../models/Product");
-const Category = require("../models/Category");
+//get all categories
+const getAllCategories = async (req, res) => {
+  try {
+    const categories = await Category.find();
+    return res.json(
+      Utils.createSuccessResponseModel(categories.length, categories)
+    );
+  } catch (err) {
+    console.log(err);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
 
 //get all products by pageSize and pageIndex
 const getAllProducts = async (req, res) => {
@@ -280,6 +292,7 @@ const uploadImage = async (req, res) => {
 };
 module.exports = {
   upload: upload,
+  getAllCategories: getAllCategories,
   getAllProducts: getAllProducts,
   getBestSeller: getBestSeller,
   addProduct: addProducts,
