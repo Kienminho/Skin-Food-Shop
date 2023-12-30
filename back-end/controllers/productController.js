@@ -41,11 +41,21 @@ const getAllCategories = async (req, res) => {
 const getAllProducts = async (req, res) => {
   try {
     const { pageSize, pageIndex } = req.query;
-    const products = await Product.find({
-      isDeleted: false,
-    })
-      .skip((pageIndex - 1) * pageSize)
-      .limit(parseInt(pageSize));
+    const categories = await Category.find();
+    //In category there is an array of products, take all of those products and add each product to the corresponding categoryName
+    let products = categories.flatMap((category) => {
+      return category.products.map((product) => {
+        return {
+          ...product._doc,
+          categoryName: category.name,
+        };
+      });
+    });
+    //pagination
+    products = products
+      .filter((product) => product.isDeleted === false)
+      .slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
+
     return res.json(
       Utils.createSuccessResponseModel(products.length, products)
     );
