@@ -8,6 +8,9 @@ import Cart from "./pages/cart";
 import ProductDetail from "./pages/product-detail";
 import Tips from "./pages/tips";
 import Blogs from "./pages/blogs";
+import SignIn from "./pages/sign-in";
+import Products from "./pages/admin/products";
+import AdminLayout from "./components/layouts/admin-layout";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +36,20 @@ const router = createBrowserRouter([
   {
     path: "/blogs",
     element: <Blogs />,
+  },
+  {
+    path: "/sign-in",
+    element: <SignIn />,
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "products",
+        element: <Products />,
+      },
+    ],
   },
 ]);
 
