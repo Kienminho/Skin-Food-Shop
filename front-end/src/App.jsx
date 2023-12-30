@@ -1,4 +1,6 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { ConfigProvider } from "antd";
+import { StyleProvider } from "@ant-design/cssinjs";
 
 import Home from "./pages/home";
 import ItemByCategory from "./pages/item-by-category";
@@ -25,7 +27,19 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: "#84BC4E",
+        },
+      }}
+    >
+      <StyleProvider hashPriority="high">
+        <RouterProvider router={router} />
+      </StyleProvider>
+    </ConfigProvider>
+  );
 }
 
 export default App;
