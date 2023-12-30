@@ -10,14 +10,6 @@ router.get("/get-info-mine", userController.getInfoMine);
 router.put("/change-password", userController.changePassword);
 
 //admin
-router.get(
-  "/get-all-users",
-  userController.checkPermission,
-  userController.getAllUsers
-);
-router.delete(
-  "/delete-user/:id",
-  userController.checkPermission,
-  userController.deleteUser
-);
+router.get("/get-all-users", userController.getAllUsers);
+router.delete("/delete-user/:id", userController.deleteUser);
 module.exports = router;
