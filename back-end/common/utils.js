@@ -27,7 +27,7 @@ const createResponseModel = (code, message, data = null) => {
   };
 };
 
-const createSuccessResponseModel = (totalRecord = 1, data) => {
+const createSuccessResponseModel = (totalRecord = 1, data = null) => {
   return {
     statusCode: 200,
     message: "Successful",

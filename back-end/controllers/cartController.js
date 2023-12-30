@@ -119,9 +119,44 @@ const updateProductInCart = async (req, res) => {
   }
 };
 
+//delete product in cart
+const deleteProductInCart = async (req, res) => {
+  try {
+    const { productId, capacity } = req.body;
+    const cart = await Cart.findOne({ userId: req.session.user });
+    const existingProductIndex = cart.products.findIndex(
+      (product) =>
+        product.productId === productId && product.capacity === capacity
+    );
+
+    //update product isChoose
+    const product = await Product.findById(productId);
+    product.capacitiesAndPrices.map((item) => {
+      if (item.capacity === capacity) {
+        item.isChoose = false;
+      }
+    });
+    await product.save();
+
+    if (existingProductIndex > -1) {
+      cart.products.splice(existingProductIndex, 1);
+    }
+
+    await cart.save();
+
+    return res.json(
+      Utils.createSuccessResponseModel(cart.products.length, cart)
+    );
+  } catch (err) {
+    console.log(err);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
 module.exports = {
   checkUserLoggedIn: checkUserLoggedIn,
   getCartByUserId: getCartByUserId,
   addProductToCart: addProductToCart,
   updateProductInCart: updateProductInCart,
+  deleteProductInCart: deleteProductInCart,
 };

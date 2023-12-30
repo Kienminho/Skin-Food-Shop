@@ -1,5 +1,15 @@
 const User = require("../models/User");
 const Utils = require("../common/utils");
+
+const checkPermission = (req, res, next) => {
+  if (req.session.role === "admin") {
+    next();
+  } else {
+    return res.json(
+      Utils.createResponseModel(400, `Bạn không có quyền truy cập`)
+    );
+  }
+};
 const handleLogin = async (req, res) => {
   const { phone, password } = req.body;
   const user = await User.findOne({ phone: phone, isDeleted: false });
@@ -25,6 +35,7 @@ const handleLogin = async (req, res) => {
   // create session
   req.session.user = user._id;
   req.session.userName = user.userName;
+  req.session.role = user.role;
   //create cookie
   res.cookie("user", user._id);
   return res.json(
@@ -129,10 +140,41 @@ const changePassword = async (req, res) => {
   return res.json(Utils.createSuccessResponseModel(1, user._id));
 };
 
+//get all user , role != admin, isDeleted = false
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({ role: { $ne: "admin" }, isDeleted: false });
+    return res.json(Utils.createSuccessResponseModel(users.length, users));
+  } catch (error) {
+    console.log(error);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.json(
+        Utils.createErrorResponseModel("Người dùng không tồn tại")
+      );
+    }
+    user.isDeleted = true;
+    await user.save();
+    return res.json(Utils.createSuccessResponseModel(0, true));
+  } catch (error) {
+    console.log(error);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
 module.exports = {
   handleLogin: handleLogin,
   handleRegister: handleRegister,
   updateInfoUser: updateInfoUser,
   getInfoMine: getInfoMine,
   changePassword: changePassword,
+  getAllUsers: getAllUsers,
+  deleteUser: deleteUser,
+  checkPermission: checkPermission,
 };

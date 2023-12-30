@@ -21,4 +21,11 @@ router.put(
   cartController.checkUserLoggedIn,
   cartController.updateProductInCart
 );
+
+//delete product in cart
+router.delete(
+  "/delete-product-in-cart",
+  cartController.checkUserLoggedIn,
+  cartController.deleteProductInCart
+);
 module.exports = router;

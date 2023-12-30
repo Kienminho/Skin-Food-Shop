@@ -1,7 +1,6 @@
 const Utils = require("../common/utils");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
-const Cart = require("../models/Cart");
 
 //Get best sale products by category, 5 products per category
 const getBestSeller = async (req, res) => {
@@ -48,6 +47,21 @@ const getBestSeller = async (req, res) => {
         bestSellerProducts.length,
         bestSellerProducts
       )
+    );
+  } catch (err) {
+    console.log(err);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
+//search product by name
+const searchProduct = async (req, res) => {
+  try {
+    const products = await Product.find({
+      name: { $regex: req.query.keyword, $options: "i" },
+    });
+    return res.json(
+      Utils.createSuccessResponseModel(products.length, products)
     );
   } catch (err) {
     console.log(err);
@@ -158,10 +172,54 @@ const getDetailProduct = async (req, res) => {
   }
 };
 
+//Get 5 products of the same category, not counting the current product
+const getRelatedProducts = async (req, res) => {
+  try {
+    const product = await Product.findOne({
+      _id: req.params.id,
+    });
+    if (!product || product === null) {
+      return res.json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
+    }
+
+    //Find products in the category, if any category contains that product, select 5 products, excluding the current product
+    const categories = await Category.find();
+    const relatedProducts = categories
+      .flatMap((category) => {
+        // If there is a product that is identical to a product in a category, select 5 products of the same category, and ignore other categories
+        if (category.products.find((p) => p._id.toString() === req.params.id)) {
+          const categoryProducts = category.products
+            .filter((p) => p._id.toString() !== req.params.id)
+            .slice(0, 5);
+          if (categoryProducts.length > 0) {
+            return {
+              category: category.name, // Assuming category has a name property
+              products: categoryProducts,
+            };
+          }
+        }
+        return []; // Return an empty array if no products match
+      })
+      .filter(Boolean); // Remove null elements from the array
+    console.log(relatedProducts);
+    return res.json(
+      Utils.createSuccessResponseModel(
+        relatedProducts[0].products.length,
+        relatedProducts
+      )
+    );
+  } catch (err) {
+    console.log(err);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
 module.exports = {
   getBestSeller: getBestSeller,
   addProduct: addProducts,
   deleteProduct: deleteProduct,
   getProductByCategory: getProductByCategory,
   getProductDetail: getDetailProduct,
+  searchProduct: searchProduct,
+  getRelatedProducts: getRelatedProducts,
 };
