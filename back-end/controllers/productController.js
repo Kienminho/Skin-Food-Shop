@@ -2,6 +2,24 @@ const Utils = require("../common/utils");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 
+//get all products by pageSize and pageIndex
+const getAllProducts = async (req, res) => {
+  try {
+    const { pageSize, pageIndex } = req.query;
+    const products = await Product.find({
+      isDeleted: false,
+    })
+      .skip((pageIndex - 1) * pageSize)
+      .limit(parseInt(pageSize));
+    return res.json(
+      Utils.createSuccessResponseModel(products.length, products)
+    );
+  } catch (err) {
+    console.log(err);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
 //Get best sale products by category, 5 products per category
 const getBestSeller = async (req, res) => {
   try {
@@ -57,9 +75,12 @@ const getBestSeller = async (req, res) => {
 //search product by name
 const searchProduct = async (req, res) => {
   try {
+    const { keyword, pageIndex = 1, pageSize = 9 } = req.query;
     const products = await Product.find({
-      name: { $regex: req.query.keyword, $options: "i" },
-    });
+      name: { $regex: keyword, $options: "i" },
+    })
+      .skip((pageIndex - 1) * pageSize)
+      .limit(parseInt(pageSize));
     return res.json(
       Utils.createSuccessResponseModel(products.length, products)
     );
@@ -130,7 +151,13 @@ const deleteProduct = async (req, res) => {
 //get product by category
 const getProductByCategory = async (req, res) => {
   try {
-    const { categoryName, minPrice, maxPrice } = req.query;
+    const {
+      categoryName,
+      minPrice,
+      maxPrice,
+      pageSize = 9,
+      pageIndex = 1,
+    } = req.query;
     const category = await Category.findOne({ name: categoryName });
     if (!category || category === null) {
       return res.json(Utils.createErrorResponseModel("Danh mục không tồn tại"));
@@ -146,6 +173,11 @@ const getProductByCategory = async (req, res) => {
           product.capacitiesAndPrices[0].price <= maxPrice
       );
     }
+
+    //pagination
+    products = products
+      .filter((product) => product.isDeleted === false)
+      .slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
     return res.json(
       Utils.createSuccessResponseModel(products.length, products)
@@ -215,6 +247,7 @@ const getRelatedProducts = async (req, res) => {
 };
 
 module.exports = {
+  getAllProducts: getAllProducts,
   getBestSeller: getBestSeller,
   addProduct: addProducts,
   deleteProduct: deleteProduct,
