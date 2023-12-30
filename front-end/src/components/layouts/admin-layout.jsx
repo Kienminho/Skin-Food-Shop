@@ -1,14 +1,37 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, Navigate, useNavigate } from "react-router-dom";
 import {
   ShoppingBagIcon,
   TablePropertiesIcon,
   CircleUserIcon,
-  CircleUserRoundIcon,
 } from "lucide-react";
-import { Input } from "antd";
+import { Input, Avatar, Dropdown } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 
+const items = [
+  {
+    key: "logout",
+    label: "Sign out",
+  },
+];
+
+const isAuthenticated = () => {
+  const user = JSON.parse(localStorage.getItem("skinFoodShopUser"));
+  return user && user.role === "admin";
+};
+
 const AdminLayout = () => {
+  const navigate = useNavigate();
+
+  const logout = ({ key }) => {
+    if (key === "logout") {
+      localStorage.removeItem("skinFoodShopUser");
+      navigate("/admin/sign-in");
+    }
+  };
+
+  if (!isAuthenticated()) {
+    return <Navigate to="/admin/sign-in" />;
+  }
   return (
     <div className="h-screen w-full flex">
       <div className="min-w-[200px] bg-[#F9FBF6] px-4">
@@ -48,7 +71,12 @@ const AdminLayout = () => {
               <div>Hi,</div>
               <div className="font-bold text-secondary-t-black">Tên tui á</div>
             </div>
-            <CircleUserRoundIcon size={48} strokeWidth={1.3} stroke="#84BC4E" />
+            <Dropdown menu={{ items, onClick: logout }} trigger={["click"]}>
+              <Avatar
+                size="large"
+                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              />
+            </Dropdown>
           </div>
         </div>
         <Outlet />

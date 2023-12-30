@@ -1,9 +1,6 @@
-import {
-  HeartIcon,
-  ShoppingCartIcon,
-  SearchIcon,
-  CircleUserRoundIcon,
-} from "lucide-react";
+import { HeartIcon, ShoppingCartIcon, SearchIcon } from "lucide-react";
+import { Avatar } from "antd";
+
 const Header = () => {
   return (
     <div className="container mx-auto flex items-center h-[84px] justify-between px-4 sm:px-6 lg:px-8 border-b border-primary-color">
@@ -32,7 +29,10 @@ const Header = () => {
             <div>Hi,</div>
             <div className="font-bold text-secondary-t-black">Tên tui á</div>
           </div>
-          <CircleUserRoundIcon size={48} strokeWidth={1.3} stroke="#84BC4E" />
+          <Avatar
+            size="large"
+            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+          />
         </div>
       </div>
     </div>

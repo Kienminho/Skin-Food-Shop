@@ -2,9 +2,15 @@ import { Button, Checkbox, Form, Input } from "antd";
 import { Link } from "react-router-dom";
 
 const SignIn = () => {
+  const onFinish = (values) => {
+    console.log(values);
+  };
+
   return (
     <div className="flex h-screen">
-      <div className="min-w-[400px] border-r bg-[#F9FBF6]">img</div>
+      <div className="min-w-[30%] border-r bg-[#F9FBF6] flex items-center justify-center">
+        <img src="/images/logo-green.png" alt="logo" className="h-32" />
+      </div>
       <div className="flex-grow grid place-items-center h-full">
         <div className="min-w-[400px]">
           <h1 className="text-4xl font-bold mb-10">Đăng nhập</h1>
@@ -15,6 +21,8 @@ const SignIn = () => {
             }}
             autoComplete="off"
             layout="vertical"
+            size="large"
+            onFinish={onFinish}
           >
             <Form.Item
               label="Username"

@@ -13,6 +13,8 @@
     "@ant-design/cssinjs": "^1.18.2",
     "@ant-design/icons": "^5.2.6",
     "@reduxjs/toolkit": "^2.0.1",
+    "@tanstack/react-query": "^5.15.5",
+    "@tanstack/react-query-devtools": "^5.15.5",
     "antd": "^5.12.5",
     "axios": "^1.6.2",
     "lucide-react": "^0.300.0",
