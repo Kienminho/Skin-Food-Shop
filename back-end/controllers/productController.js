@@ -3,6 +3,58 @@ const Product = require("../models/Product");
 const Category = require("../models/Category");
 const Cart = require("../models/Cart");
 
+//Get best sale products by category, 5 products per category
+const getBestSeller = async (req, res) => {
+  try {
+    const bestSellerProducts = await Category.aggregate([
+      {
+        $project: {
+          name: 1,
+          products: {
+            $slice: [
+              {
+                $map: {
+                  input: {
+                    $slice: [
+                      {
+                        $filter: {
+                          input: "$products",
+                          as: "product",
+                          cond: { $ne: ["$$product.isDeleted", true] },
+                        },
+                      },
+                      4, // get 5 best seller products
+                    ],
+                  },
+                  as: "product",
+                  in: {
+                    productCode: "$$product.productCode",
+                    name: "$$product.name",
+                    description: "$$product.description",
+                    capacitiesAndPrices: "$$product.capacitiesAndPrices",
+                    image: "$$product.image",
+                  },
+                },
+              },
+              5, // get 5 best seller categories
+            ],
+          },
+        },
+      },
+    ]);
+
+    return res.json(
+      Utils.createSuccessResponseModel(
+        bestSellerProducts.length,
+        bestSellerProducts
+      )
+    );
+  } catch (err) {
+    console.log(err);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
 const addProducts = async (req, res) => {
   try {
     let category = await Category.findOne({ name: req.body.categoryName });
@@ -107,6 +159,7 @@ const getDetailProduct = async (req, res) => {
 };
 
 module.exports = {
+  getBestSeller: getBestSeller,
   addProduct: addProducts,
   deleteProduct: deleteProduct,
   getProductByCategory: getProductByCategory,
