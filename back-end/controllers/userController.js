@@ -39,9 +39,7 @@ const handleLogin = async (req, res) => {
   req.session.role = user.role;
   //create cookie
   res.cookie("user", user._id);
-  return res.json(
-    Utils.createSuccessResponseModel(1, { Id: user._id, Role: user.role })
-  );
+  return res.json(Utils.createSuccessResponseModel(1, user));
 };
 
 const handleRegister = async (req, res) => {
