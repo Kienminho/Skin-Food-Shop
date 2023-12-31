@@ -5,10 +5,6 @@ const InvoiceItem = require("../models/InvoiceItem");
 
 const createPaymentIntent = async (req, res) => {
   try {
-    //check if user is logged in
-    if (!req.session.user) {
-      return res.json(Utils.createErrorResponseModel("Vui lòng đăng nhập"));
-    }
     const {
       products,
       buyerName,
@@ -19,7 +15,7 @@ const createPaymentIntent = async (req, res) => {
     } = req.body;
     //create invoice
     const invoice = new Invoice({
-      user: req.session.user,
+      user: req.user.id,
       buyerName,
       address,
       phoneNumber,
@@ -31,17 +27,14 @@ const createPaymentIntent = async (req, res) => {
     await Promise.all(
       products.map(async (p) => {
         const product = await Product.findById(p.Id);
-        const { capacity, price } = product.capacitiesAndPrices.find(
-          (i) => i.isChoose === true
-        );
         const invoiceItem = new InvoiceItem({
           invoiceId: invoice._id,
           productId: product._id,
           productName: product.name,
-          capacity: capacity,
-          capacityPrice: price,
+          capacity: product.capacity,
+          capacityPrice: product.price,
           quantity: p.quantity,
-          totalPrice: p.quantity * price,
+          totalPrice: p.quantity * product.price,
         });
         await invoiceItem.save();
       })

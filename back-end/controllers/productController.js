@@ -26,10 +26,14 @@ const upload = multer({ storage: storage });
 //get all categories
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
-    return res.json(
-      Utils.createSuccessResponseModel(categories.length, categories)
-    );
+    const categories = await Category.find({ isDeleted: false });
+    const data = categories.map((category) => {
+      return {
+        name: category.name,
+      };
+    });
+
+    return res.json(Utils.createSuccessResponseModel(data.length, data));
   } catch (err) {
     console.log(err);
     return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
@@ -55,19 +59,8 @@ const getAllProducts = async (req, res) => {
     products = products
       .filter((product) => product.isDeleted === false)
       .slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
-    //Each product will be a capacitiesAndPrices, if a product has 3 Each product will be a capacitiesAndPrices then it will create 3 products
-    const data = products.flatMap((product) => {
-      return product.capacitiesAndPrices.map((capacityAndPrice) => {
-        delete product.capacitiesAndPrices;
-        return {
-          ...product,
-          capacities: capacityAndPrice.capacity,
-          price: capacityAndPrice.price,
-        };
-      });
-    });
 
-    return res.json(Utils.createSuccessResponseModel(data.length, data));
+    return res.json(Utils.createSuccessResponseModel(totalProducts, products));
   } catch (err) {
     console.log(err);
     return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
@@ -152,33 +145,16 @@ const addProducts = async (req, res) => {
         name: req.body.categoryName,
       });
     }
-    const products = req.body.products; // Assuming req.body.products is an array of products
-    // Validate if products is an array
-    if (!Array.isArray(products)) {
-      return res.json(Utils.createErrorResponseModel("Invalid products data"));
-    }
 
-    // Map each product in the array to a new product instance and save it
-    const newProducts = await Promise.all(
-      products.map(async (product) => {
-        const { productCode, name, description, quantity, capacity, image } =
-          product;
-        const newProduct = new Product({
-          productCode,
-          name,
-          description,
-          quantity: quantity,
-          capacitiesAndPrices: capacity,
-          image: image,
-        });
-        category.products.push(newProduct);
-        await newProduct.save();
-      })
-    );
+    const newProduct = new Product({
+      ...req.body.product,
+    });
+    category.products.push(newProduct);
+    await newProduct.save();
     await category.save();
 
     return res.json(
-      Utils.createSuccessResponseModel("Thêm sản phẩm thành công", newProducts)
+      Utils.createSuccessResponseModel("Thêm sản phẩm thành công", newProduct)
     );
   } catch (err) {
     console.log(err);
@@ -189,17 +165,53 @@ const addProducts = async (req, res) => {
 //update product
 const updateProduct = async (req, res) => {
   try {
-    //update quantity for all products
-    const quantity = req.body.quantity;
+    const {
+      productCode,
+      productId,
+      categoryName,
+      name,
+      capacity,
+      price,
+      description,
+      quantity,
+      image,
+    } = req.body;
+
+    const product = await Product.findById(productId);
+    //update product
+    product.productCode = productCode;
+    product.name = name;
+    product.description = description;
+    product.image = image;
+    product.capacity = capacity;
+    product.price = price;
+    product.quantity = quantity;
+    await product.save();
 
     //update quantity for each product in category
     const categories = await Category.find();
     categories.forEach(async (category) => {
-      category.products.forEach(async (product) => {
-        product.quantity = quantity;
-        await product.save();
-      });
-      await category.save();
+      //find product in category
+      const index = category.products.findIndex(
+        (p) => p._id.toString() === productId
+      );
+      //if categoryName is changed, delete product in old category and add product to new category
+      if (index !== -1 && category.name !== categoryName) {
+        category.products.splice(index, 1);
+        await category.save();
+        //add product to new category
+        const newCategory = await Category.findOne({ name: categoryName });
+        if (!newCategory || newCategory === null) {
+          const newCategory = new Category({
+            name: categoryName,
+          });
+          newCategory.products.push(product);
+          await newCategory.save();
+        } else {
+          newCategory.products.push(product);
+          await newCategory.save();
+        }
+      }
     });
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
@@ -211,9 +223,7 @@ const updateProduct = async (req, res) => {
 // delete product
 const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findOne({
-      productCode: req.params.productCode,
-    });
+    const product = await Product.findById(req.params.productCode);
     if (!product || product === null) {
       return res.json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
     }
@@ -223,12 +233,17 @@ const deleteProduct = async (req, res) => {
     const categories = await Category.find();
     categories.forEach(async (category) => {
       const index = category.products.findIndex(
-        (p) => p.productCode === req.params.productCode
+        (p) =>
+          p._id.toString() === req.params.productCode && p.isDeleted === false
       );
       if (index !== -1) {
         //change isDelete of product to true
         category.products[index].isDeleted = true;
-        if (category.products.length === 0) {
+        // count number of product isDeleted == false in category
+        const numberOfProduct = category.products.filter(
+          (p) => p.isDeleted === false
+        ).length;
+        if (numberOfProduct === 0) {
           category.isDeleted = true;
         }
         await category.save();
@@ -262,9 +277,7 @@ const getProductByCategory = async (req, res) => {
       products = category.products;
     } else {
       products = category.products.filter(
-        (product) =>
-          product.capacitiesAndPrices[0].price >= minPrice &&
-          product.capacitiesAndPrices[0].price <= maxPrice
+        (product) => product.price >= minPrice && product.price <= maxPrice
       );
     }
 
@@ -274,7 +287,7 @@ const getProductByCategory = async (req, res) => {
       .slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
     return res.json(
-      Utils.createSuccessResponseModel(products.length, products)
+      Utils.createSuccessResponseModel(category.products.length, products)
     );
   } catch (err) {
     console.log(err);
