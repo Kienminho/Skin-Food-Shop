@@ -196,7 +196,7 @@ const updateProduct = async (req, res) => {
         (p) => p._id.toString() === productId
       );
       //if categoryName is changed, delete product in old category and add product to new category
-      if (index !== -1 && category.name !== categoryName) {
+      if (index !== -1) {
         category.products.splice(index, 1);
         await category.save();
         //add product to new category
@@ -208,12 +208,10 @@ const updateProduct = async (req, res) => {
           newCategory.products.push(product);
           await newCategory.save();
         } else {
+          category.products.splice(index, 1);
           newCategory.products.push(product);
           await newCategory.save();
         }
-      } else {
-        category.products[index].quantity = quantity;
-        await category.save();
       }
     });
     return res.json(Utils.createSuccessResponseModel(0, true));
