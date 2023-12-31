@@ -9,14 +9,14 @@ const Category = require("../models/Category");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const basePath = "./public/images/products/";
-    const categoryName = req.body.categoryName;
-    const path = basePath + categoryName;
-    //Create a folder named with categoryName, if it doesn't already exist?
-    if (!fs.existsSync(path)) {
-      fs.mkdirSync(path);
-    }
+    // const categoryName = req.body.categoryName;
+    // const path = basePath + categoryName;
+    // //Create a folder named with categoryName, if it doesn't already exist?
+    // if (!fs.existsSync(path)) {
+    //   fs.mkdirSync(path);
+    // }
 
-    cb(null, path);
+    cb(null, basePath);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + Guid.raw() + ".jpg");
@@ -292,7 +292,7 @@ const getRelatedProducts = async (req, res) => {
 
 const uploadImage = async (req, res) => {
   try {
-    const path = req.file.path.match(/public(.*)/)?.[1];
+    const path = process.env.BASE_URL + req.file.path.match(/public(.*)/)?.[1];
     return res.json(Utils.createSuccessResponseModel(0, path));
   } catch (err) {
     console.log(err);
