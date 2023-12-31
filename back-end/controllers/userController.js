@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Invoice = require("../models/Invoice");
 const Utils = require("../common/utils");
+const Auth = require("../common/auth");
 
 const checkPermission = (req, res, next) => {
   console.log(req.session.role);
@@ -12,6 +13,19 @@ const checkPermission = (req, res, next) => {
     );
   }
 };
+const refreshToken = async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.json(
+      Utils.createResponseModel(400, `Người dùng không tồn tại.`)
+    );
+  }
+  user.accessToken = Auth.generateAccessToken(user);
+  user.refreshToken = Auth.generateRefreshToken(user);
+  await user.save();
+  return res.json(Utils.createSuccessResponseModel(1, user));
+};
+
 const handleLogin = async (req, res) => {
   const { phone, password } = req.body;
   const user = await User.findOne({ phone: phone, isDeleted: false });
@@ -34,10 +48,13 @@ const handleLogin = async (req, res) => {
       Utils.createResponseModel(400, `Mật khẩu không đúng, vui lòng thử lại`)
     );
   }
+  user.accessToken = Auth.generateAccessToken(user);
+  user.refreshToken = Auth.generateRefreshToken(user);
+  await user.save();
   // create session
-  req.session.user = user._id;
-  req.session.userName = user.userName;
-  req.session.role = user.role;
+  // req.session.user = user._id;
+  // req.session.userName = user.userName;
+  // req.session.role = user.role;
   console.log("Role:" + user.role);
   //create cookie
   res.cookie("user", user._id);
@@ -97,7 +114,7 @@ const updateInfoUser = async (req, res) => {
 };
 
 const getInfoMine = async (req, res) => {
-  const user = await User.findById(req.session.user);
+  const user = await User.findById(req.user.id);
   if (!user) {
     return res.json(
       Utils.createResponseModel(
@@ -193,4 +210,5 @@ module.exports = {
   getAllUsers: getAllUsers,
   deleteUser: deleteUser,
   checkPermission: checkPermission,
+  refreshToken: refreshToken,
 };
