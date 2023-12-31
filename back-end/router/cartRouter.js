@@ -25,7 +25,7 @@ router.put(
 
 //delete product in cart
 router.delete(
-  "/delete-product-in-cart",
+  "/delete-product-in-cart/:productId",
   Auth.authenticateToken,
   cartController.deleteProductInCart
 );

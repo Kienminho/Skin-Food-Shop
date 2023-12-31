@@ -1,5 +1,4 @@
 const multer = require("multer");
-const fs = require("fs");
 const Guid = require("guid");
 
 const Utils = require("../common/utils");
@@ -33,10 +32,14 @@ const upload = multer({ storage: storage });
 //get all categories
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
-    return res.json(
-      Utils.createSuccessResponseModel(categories.length, categories)
-    );
+    const categories = await Category.find({ isDeleted: false });
+    const data = categories.map((category) => {
+      return {
+        name: category.name,
+      };
+    });
+
+    return res.json(Utils.createSuccessResponseModel(data.length, data));
   } catch (err) {
     console.log(err);
     return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
@@ -148,32 +151,75 @@ const addProducts = async (req, res) => {
         name: req.body.categoryName,
       });
     }
-    const products = req.body.products; // Assuming req.body.products is an array of products
-    // Validate if products is an array
-    if (!Array.isArray(products)) {
-      return res.json(Utils.createErrorResponseModel("Invalid products data"));
-    }
 
-    // Map each product in the array to a new product instance and save it
-    const newProducts = await Promise.all(
-      products.map(async (product) => {
-        const { productCode, name, description, capacity, image } = product;
-        const newProduct = new Product({
-          productCode,
-          name,
-          description,
-          capacitiesAndPrices: capacity,
-          image: image,
-        });
-        category.products.push(newProduct);
-        await newProduct.save();
-      })
-    );
+    const newProduct = new Product({
+      ...req.body.product,
+    });
+    category.products.push(newProduct);
+    await newProduct.save();
     await category.save();
 
     return res.json(
-      Utils.createSuccessResponseModel("Thêm sản phẩm thành công", newProducts)
+      Utils.createSuccessResponseModel("Thêm sản phẩm thành công", newProduct)
     );
+  } catch (err) {
+    console.log(err);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
+//update product
+const updateProduct = async (req, res) => {
+  try {
+    const {
+      productCode,
+      productId,
+      categoryName,
+      name,
+      capacity,
+      price,
+      description,
+      quantity,
+      image,
+    } = req.body;
+
+    const product = await Product.findById(productId);
+    //update product
+    product.productCode = productCode;
+    product.name = name;
+    product.description = description;
+    product.image = image;
+    product.capacity = capacity;
+    product.price = price;
+    product.quantity = quantity;
+    await product.save();
+
+    //update quantity for each product in category
+    const categories = await Category.find();
+    categories.forEach(async (category) => {
+      //find product in category
+      const index = category.products.findIndex(
+        (p) => p._id.toString() === productId
+      );
+      //if categoryName is changed, delete product in old category and add product to new category
+      if (index !== -1 && category.name !== categoryName) {
+        category.products.splice(index, 1);
+        await category.save();
+        //add product to new category
+        const newCategory = await Category.findOne({ name: categoryName });
+        if (!newCategory || newCategory === null) {
+          const newCategory = new Category({
+            name: categoryName,
+          });
+          newCategory.products.push(product);
+          await newCategory.save();
+        } else {
+          newCategory.products.push(product);
+          await newCategory.save();
+        }
+      }
+    });
+    return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
     console.log(err);
     return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
@@ -183,14 +229,33 @@ const addProducts = async (req, res) => {
 // delete product
 const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findOne({
-      productCode: req.params.productCode,
-    });
+    const product = await Product.findById(req.params.productCode);
     if (!product || product === null) {
       return res.json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
     }
     product.isDeleted = true;
     await product.save();
+    //find product in all category and delete it. If category has no product, delete category
+    const categories = await Category.find();
+    categories.forEach(async (category) => {
+      const index = category.products.findIndex(
+        (p) =>
+          p._id.toString() === req.params.productCode && p.isDeleted === false
+      );
+      if (index !== -1) {
+        //change isDelete of product to true
+        category.products[index].isDeleted = true;
+        // count number of product isDeleted == false in category
+        const numberOfProduct = category.products.filter(
+          (p) => p.isDeleted === false
+        ).length;
+        if (numberOfProduct === 0) {
+          category.isDeleted = true;
+        }
+        await category.save();
+      }
+    });
+
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
     console.log(err);
@@ -218,9 +283,7 @@ const getProductByCategory = async (req, res) => {
       products = category.products;
     } else {
       products = category.products.filter(
-        (product) =>
-          product.capacitiesAndPrices[0].price >= minPrice &&
-          product.capacitiesAndPrices[0].price <= maxPrice
+        (product) => product.price >= minPrice && product.price <= maxPrice
       );
     }
 
@@ -230,7 +293,7 @@ const getProductByCategory = async (req, res) => {
       .slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
     return res.json(
-      Utils.createSuccessResponseModel(products.length, products)
+      Utils.createSuccessResponseModel(category.products.length, products)
     );
   } catch (err) {
     console.log(err);
@@ -311,6 +374,7 @@ module.exports = {
   getAllProducts: getAllProducts,
   getBestSeller: getBestSeller,
   addProduct: addProducts,
+  updateProduct: updateProduct,
   deleteProduct: deleteProduct,
   getProductByCategory: getProductByCategory,
   getProductDetail: getDetailProduct,

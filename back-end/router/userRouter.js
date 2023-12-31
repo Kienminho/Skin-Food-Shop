@@ -12,13 +12,21 @@ router.post(
 );
 router.post("/login", userController.handleLogin);
 router.post("/register", userController.handleRegister);
-router.put("/update-info", userController.updateInfoUser);
+router.put(
+  "/update-info",
+  Auth.authenticateToken,
+  userController.updateInfoUser
+);
 router.get(
   "/get-info-mine",
   Auth.authenticateToken,
   userController.getInfoMine
 );
-router.put("/change-password", userController.changePassword);
+router.put(
+  "/change-password",
+  Auth.authenticateRefreshToken,
+  userController.changePassword
+);
 
 //admin
 router.get(

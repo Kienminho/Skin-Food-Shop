@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const CapacityPrice = require("./CapacityPrice");
 const ProductSchema = new mongoose.Schema({
   productCode: {
     type: String,
@@ -17,10 +16,18 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  capacitiesAndPrices: [CapacityPrice.schema],
-  quantity: {
+  capacity: {
+    type: String,
+    required: true,
+  },
+  price: {
     type: Number,
     required: true,
+  },
+  quantity: {
+    type: Number,
+    default: 0,
+    required: false,
   },
   isDeleted: {
     type: Boolean,

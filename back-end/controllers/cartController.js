@@ -2,19 +2,13 @@ const Utils = require("../common/utils");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 
-const checkUserLoggedIn = (req, res, next) => {
-  if (!req.session.user) {
-    return res.json(Utils.createErrorResponseModel("Vui lòng đăng nhập."));
-  }
-  next();
-};
-
 const getCartByUserId = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ userId: req.session.user });
+    let cart = await Cart.findOne({ userId: req.user.id });
     if (!cart || cart === null) {
-      cart = new Cart({ userId: req.session.user, products: [] });
+      cart = new Cart({ userId: req.user.id, products: [] });
       await cart.save();
+      return res.json(Utils.createSuccessResponseModel(0, []));
     }
 
     // Get product information based on productId and add it to products, and also remove productId from that object.
@@ -23,7 +17,7 @@ const getCartByUserId = async (req, res) => {
       // Update product with productInfo and remove productId
       return { ...product.toObject(), productInfo: foundProduct.toObject() };
     });
-    const products = await Promise.all(productPromises);
+    const products = (await Promise.all(productPromises)) ?? [];
 
     return res.json(
       Utils.createSuccessResponseModel(products.length, products)
@@ -36,14 +30,13 @@ const getCartByUserId = async (req, res) => {
 
 const addProductToCart = async (req, res) => {
   try {
-    const { productId, capacity, quantity } = req.body;
+    const { productId, quantity } = req.body;
     const cart =
-      (await Cart.findOne({ userId: req.session.user })) ||
-      new Cart({ userId: req.session.user });
+      (await Cart.findOne({ userId: req.user.id })) ||
+      new Cart({ userId: req.user.id });
 
     const existingProduct = cart.products.find(
-      (product) =>
-        product.productId === productId && product.capacity === capacity
+      (product) => product.productId.toString() === productId
     );
 
     if (existingProduct) {
@@ -52,17 +45,12 @@ const addProductToCart = async (req, res) => {
         existingProduct.capacityPrice * existingProduct.quantity;
     } else {
       const product = await Product.findById(productId);
-      product.capacitiesAndPrices.map((item) => {
-        if (item.capacity === capacity) {
-          item.isChoose = true;
-          cart.products.push({
-            productId: productId,
-            capacity: capacity,
-            capacityPrice: item.price,
-            quantity: quantity,
-            price: item.price * quantity,
-          });
-        }
+      cart.products.push({
+        productId: productId,
+        capacity: product.capacity,
+        capacityPrice: product.price,
+        quantity: quantity,
+        price: product.price * quantity,
       });
       product.save();
     }
@@ -81,33 +69,23 @@ const addProductToCart = async (req, res) => {
 //update quantity and capacity of product in cart
 const updateProductInCart = async (req, res) => {
   try {
-    let currentCapacityPrice = 0;
-    const { productId, capacity } = req.body;
-    const product = await Product.findById(productId);
-    product.capacitiesAndPrices.map((item) => {
-      if (item.capacity === capacity) {
-        item.isChoose = true;
-        currentCapacityPrice = item.price;
-      }
-      if (item.capacity !== capacity && item.isChoose === true) {
-        item.isChoose = false;
-      }
-    });
-    //save product
-    product.save();
+    const { productId, quantity } = req.body;
 
-    const cart = await Cart.findOne({ userId: req.session.user });
+    const cart = await Cart.findOne({ userId: req.user.id });
     const existingProduct = cart.products.find(
-      (product) => product.productId === productId
+      (product) => product.productId.toString() === productId
     );
 
     if (existingProduct) {
-      existingProduct.capacity = capacity;
-      existingProduct.capacityPrice = currentCapacityPrice;
+      existingProduct.quantity += quantity;
       existingProduct.price =
         existingProduct.capacityPrice * existingProduct.quantity;
     }
 
+    // If quantity is 0, remove product from cart
+    if (existingProduct.quantity === 0) {
+      cart.products.remove(existingProduct);
+    }
     await cart.save();
 
     return res.json(
@@ -122,21 +100,11 @@ const updateProductInCart = async (req, res) => {
 //delete product in cart
 const deleteProductInCart = async (req, res) => {
   try {
-    const { productId, capacity } = req.body;
-    const cart = await Cart.findOne({ userId: req.session.user });
+    const productId = req.params.productId;
+    const cart = await Cart.findOne({ userId: req.user.id });
     const existingProductIndex = cart.products.findIndex(
-      (product) =>
-        product.productId === productId && product.capacity === capacity
+      (product) => product.productId.toString() === productId
     );
-
-    //update product isChoose
-    const product = await Product.findById(productId);
-    product.capacitiesAndPrices.map((item) => {
-      if (item.capacity === capacity) {
-        item.isChoose = false;
-      }
-    });
-    await product.save();
 
     if (existingProductIndex > -1) {
       cart.products.splice(existingProductIndex, 1);
@@ -154,7 +122,6 @@ const deleteProductInCart = async (req, res) => {
 };
 
 module.exports = {
-  checkUserLoggedIn: checkUserLoggedIn,
   getCartByUserId: getCartByUserId,
   addProductToCart: addProductToCart,
   updateProductInCart: updateProductInCart,
