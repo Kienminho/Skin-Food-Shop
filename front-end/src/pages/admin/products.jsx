@@ -1,32 +1,7 @@
 import { Select, Button, Table } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-
-const dataSource = [
-  {
-    key: "1",
-    name: "Mike",
-    age: 32,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "3",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "4",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-];
+import { useProducts } from "../../hooks/use-products";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
   {
@@ -41,8 +16,8 @@ const columns = [
   },
   {
     title: "SKU",
-    dataIndex: "address",
-    key: "address",
+    dataIndex: "productCode",
+    key: "productCode",
   },
   {
     title: "Danh mục",
@@ -56,8 +31,8 @@ const columns = [
   },
   {
     title: "Có sẵn",
-    dataIndex: "address",
-    key: "address",
+    dataIndex: "quantity",
+    key: "quantity",
   },
   {
     title: "Thao tác",
@@ -76,6 +51,11 @@ const columns = [
 ];
 
 const Products = () => {
+  const navigate = useNavigate();
+  const { data, isLoading } = useProducts();
+
+  console.log("data", data);
+
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between mb-6">
@@ -91,12 +71,22 @@ const Products = () => {
             },
           ]}
         />
-        <Button type="primary" icon={<PlusOutlined />}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate("/admin/products/create")}
+        >
           Thêm
         </Button>
       </div>
       <div>
-        <Table rowSelection={{}} dataSource={dataSource} columns={columns} />;
+        <Table
+          loading={isLoading}
+          rowSelection={{}}
+          dataSource={data?.data ?? []}
+          columns={columns}
+          rowKey="_id"
+        />
       </div>
     </div>
   );

@@ -1,4 +1,25 @@
 import axios from "axios";
+import { authApi } from "./auth";
+
+function getLocalAccessToken() {
+  const accessToken = JSON.parse(
+    localStorage.getItem("skinFoodShopUser")
+  )?.accessToken;
+  return accessToken;
+}
+
+function getLocalRefreshToken() {
+  const refreshToken = JSON.parse(
+    localStorage.getItem("skinFoodShopUser")
+  )?.refreshToken;
+  return refreshToken;
+}
+
+function setAccessToken(newAccessToken) {
+  const user = JSON.parse(localStorage.getItem("skinFoodShopUser"));
+  user.accessToken = newAccessToken;
+  localStorage.setItem("skinFoodShopUser", JSON.stringify(user));
+}
 
 const axiosClient = axios.create({
   baseURL: "https://skin-food-store.onrender.com/api",
@@ -9,6 +30,10 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    const token = getLocalAccessToken();
+    if (token) {
+      config.headers.Authorization = token;
+    }
     return config;
   },
   function (error) {
@@ -24,9 +49,30 @@ axiosClient.interceptors.response.use(
     // Do something with response data
     return response.data;
   },
-  function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
+  async function (error) {
+    const originalRequest = error.config;
+
+    // If the error status is 401 and the request was unauthorized
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const newAccessToken = await authApi.getAccessToken(
+          getLocalRefreshToken()
+        ); // Refresh the token
+        setAccessToken(newAccessToken); // Set the new access token in the header
+
+        // Retry the original request with the new token
+        originalRequest.headers["Authorization"] = newAccessToken;
+        return axiosClient(originalRequest);
+      } catch (refreshError) {
+        // Handle refresh token failure (e.g., redirect to login)
+        console.error("Error refreshing token:", refreshError);
+        // Redirect to login or handle logout
+        // Example: window.location.href = '/login';
+        throw refreshError;
+      }
+    }
     return Promise.reject(error);
   }
 );

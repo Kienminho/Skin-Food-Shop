@@ -35,8 +35,8 @@ const AdminSignIn = () => {
     });
   };
 
-  const onValuesChange = (changedValues, allValues) => {
-    if (changedValues.remember) {
+  const onValuesChange = (_, allValues) => {
+    if (allValues.remember) {
       localStorage.setItem("skinFoodShopAuth", JSON.stringify(allValues));
     } else {
       localStorage.removeItem("skinFoodShopAuth");

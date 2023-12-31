@@ -1,5 +1,6 @@
 import { Select, Button, Table } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useUsers } from "../../hooks/use-users";
 
 const dataSource = [
   {
@@ -72,6 +73,10 @@ const columns = [
 ];
 
 const Users = () => {
+  const { data } = useUsers();
+
+  console.log("data", data);
+
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between mb-6">

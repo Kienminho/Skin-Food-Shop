@@ -18,6 +18,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AdminSignIn from "./pages/admin/admin-sign-in";
 import AdminSignUp from "./pages/admin/admin-sign-up";
+import CreateProduct from "./pages/admin/create-product";
+import Checkout from "./pages/checkout";
+import Profile from "./pages/profile";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -60,12 +63,24 @@ const router = createBrowserRouter([
     element: <AdminSignUp />,
   },
   {
+    path: "/checkout",
+    element: <Checkout />,
+  },
+  {
+    path: "/profile",
+    element: <Profile />,
+  },
+  {
     path: "/admin",
     element: <AdminLayout />,
     children: [
       {
         path: "products",
         element: <Products />,
+      },
+      {
+        path: "products/create",
+        element: <CreateProduct />,
       },
       {
         path: "categories",

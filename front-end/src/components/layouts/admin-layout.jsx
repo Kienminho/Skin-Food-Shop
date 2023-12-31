@@ -19,6 +19,11 @@ const isAuthenticated = () => {
   return user && user.role === "admin";
 };
 
+const getUserInfo = () => {
+  const user = JSON.parse(localStorage.getItem("skinFoodShopUser"));
+  return user;
+};
+
 const AdminLayout = () => {
   const navigate = useNavigate();
 
@@ -44,12 +49,12 @@ const AdminLayout = () => {
               </Link>
             </li>
             <li className="bg-primary-color rounded p-2 cursor-pointer text-white">
-              <Link className="flex items-center gap-2">
+              <Link className="flex items-center gap-2" to="/admin/categories">
                 <TablePropertiesIcon size={16} /> Danh mục
               </Link>
             </li>
             <li className="bg-primary-color rounded p-2 cursor-pointer text-white">
-              <Link className="flex items-center gap-2">
+              <Link className="flex items-center gap-2" to="/admin/users">
                 <CircleUserIcon size={16} /> Khách hàng
               </Link>
             </li>
@@ -69,7 +74,9 @@ const AdminLayout = () => {
           <div className="  flex items-center gap-2">
             <div className="flex flex-col items-end">
               <div>Hi,</div>
-              <div className="font-bold text-secondary-t-black">Tên tui á</div>
+              <div className="font-bold text-secondary-t-black">
+                {getUserInfo()?.name ?? ""}
+              </div>
             </div>
             <Dropdown menu={{ items, onClick: logout }} trigger={["click"]}>
               <Avatar

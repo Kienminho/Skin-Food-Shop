@@ -13,4 +13,7 @@ export const authApi = {
       password: body.password,
     });
   },
+  getAccessToken(refreshToken) {
+    return axiosClient.get("/user/getAccessToken", { refreshToken });
+  },
 };
