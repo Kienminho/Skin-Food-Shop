@@ -93,7 +93,7 @@ const handleRegister = async (req, res) => {
 
 const updateInfoUser = async (req, res) => {
   const { email, name, birthday, address } = req.body;
-  const user = await User.findById(req.session.user);
+  const user = await User.findById(req.user.id);
   if (!user) {
     return res.json(
       Utils.createResponseModel(
@@ -137,7 +137,7 @@ const changePassword = async (req, res) => {
       )
     );
   }
-  const user = await User.findById(req.session.user);
+  const user = await User.findById(req.user.id);
   if (!user) {
     return res.json(
       Utils.createResponseModel(400, `Vui lòng đăng nhập để đổi mật khẩu.`)
