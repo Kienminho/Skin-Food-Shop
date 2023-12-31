@@ -3,6 +3,7 @@ const Invoice = require("../models/Invoice");
 const Utils = require("../common/utils");
 
 const checkPermission = (req, res, next) => {
+  console.log(req.session.role);
   if (req.session.role === "admin") {
     next();
   } else {
@@ -37,11 +38,11 @@ const handleLogin = async (req, res) => {
   req.session.user = user._id;
   req.session.userName = user.userName;
   req.session.role = user.role;
+  console.log("Role:" + user.role);
   //create cookie
   res.cookie("user", user._id);
-  return res.json(
-    Utils.createSuccessResponseModel(1, { Id: user._id, Role: user.role })
-  );
+  console.log("user logined: " + user);
+  return res.json(Utils.createSuccessResponseModel(1, user));
 };
 
 const handleRegister = async (req, res) => {
