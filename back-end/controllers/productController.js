@@ -36,7 +36,9 @@ const getAllCategories = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(data.length, data));
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -63,7 +65,9 @@ const getAllProducts = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(totalProducts, products));
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -115,7 +119,9 @@ const getBestSeller = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -133,7 +139,9 @@ const searchProduct = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -158,7 +166,9 @@ const addProducts = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -216,7 +226,9 @@ const updateProduct = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -225,7 +237,9 @@ const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.productCode);
     if (!product || product === null) {
-      return res.json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
+      return res
+        .status(404)
+        .json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
     }
     product.isDeleted = true;
     await product.save();
@@ -253,7 +267,9 @@ const deleteProduct = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -291,7 +307,9 @@ const getProductByCategory = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -302,7 +320,9 @@ const getDetailProduct = async (req, res) => {
       _id: req.params.id,
     });
     if (!product || product === null) {
-      return res.json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
+      return res
+        .status(404)
+        .json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
     }
     return res.json(Utils.createSuccessResponseModel(1, product));
   } catch (err) {
@@ -318,7 +338,9 @@ const getRelatedProducts = async (req, res) => {
       _id: req.params.id,
     });
     if (!product || product === null) {
-      return res.json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
+      return res
+        .status(404)
+        .json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
     }
 
     //Find products in the category, if any category contains that product, select 5 products, excluding the current product
@@ -349,7 +371,9 @@ const getRelatedProducts = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 
@@ -359,7 +383,9 @@ const uploadImage = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(0, path));
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res
+      .status(400)
+      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
   }
 };
 module.exports = {

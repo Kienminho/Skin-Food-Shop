@@ -42,7 +42,7 @@ const createPaymentIntent = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel());
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 

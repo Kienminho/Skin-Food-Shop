@@ -24,7 +24,7 @@ const getCartByUserId = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -62,7 +62,7 @@ const addProductToCart = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -93,7 +93,7 @@ const updateProductInCart = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -117,7 +117,7 @@ const deleteProductInCart = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
