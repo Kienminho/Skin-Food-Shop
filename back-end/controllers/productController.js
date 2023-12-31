@@ -52,13 +52,12 @@ const getAllProducts = async (req, res) => {
       });
     });
     //pagination
+    const totalProducts = products.length;
     products = products
       .filter((product) => product.isDeleted === false)
       .slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
-    return res.json(
-      Utils.createSuccessResponseModel(products.length, products)
-    );
+    return res.json(Utils.createSuccessResponseModel(totalProducts, products));
   } catch (err) {
     console.log(err);
     return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
