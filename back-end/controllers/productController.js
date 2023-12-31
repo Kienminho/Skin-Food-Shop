@@ -211,6 +211,9 @@ const updateProduct = async (req, res) => {
           newCategory.products.push(product);
           await newCategory.save();
         }
+      } else {
+        category.products[index].quantity = quantity;
+        await category.save();
       }
     });
     return res.json(Utils.createSuccessResponseModel(0, true));
