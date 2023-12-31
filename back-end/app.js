@@ -1,11 +1,13 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const session = require("express-session");
-const RedisStore = require("connect-redis")(session);
-const cookieParser = require("cookie-parser");
-
 require("dotenv").config();
+
+const client = require("./common/redisConnect");
+const RedisStore = require("connect-redis").default;
+
 const app = express();
 
 //middleware
@@ -14,7 +16,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   session({
-    store: new RedisStore({ client: redisClient }),
+    store: new RedisStore({ client: client }),
     secret: "my-key",
     resave: true,
     saveUninitialized: true,
