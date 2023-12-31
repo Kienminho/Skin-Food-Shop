@@ -36,9 +36,7 @@ const getAllCategories = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(data.length, data));
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -65,9 +63,7 @@ const getAllProducts = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(totalProducts, products));
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -119,9 +115,7 @@ const getBestSeller = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -139,9 +133,7 @@ const searchProduct = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -166,9 +158,7 @@ const addProducts = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -226,9 +216,7 @@ const updateProduct = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -267,9 +255,7 @@ const deleteProduct = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -307,9 +293,7 @@ const getProductByCategory = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -319,15 +303,27 @@ const getDetailProduct = async (req, res) => {
     const product = await Product.findOne({
       _id: req.params.id,
     });
+
     if (!product || product === null) {
       return res
         .status(404)
         .json(Utils.createErrorResponseModel("Sản phẩm không tồn tại"));
     }
-    return res.json(Utils.createSuccessResponseModel(1, product));
+    //If a product exists, I will find which category that product exists in and return the categoryName?
+    const categories = await Category.find();
+    const categoryName = categories.find((category) =>
+      category.products.some((p) => p._id.toString() === req.params.id)
+    )?.name;
+
+    return res.json(
+      Utils.createSuccessResponseModel(1, {
+        ...product.toObject(),
+        categoryName,
+      })
+    );
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -371,9 +367,7 @@ const getRelatedProducts = async (req, res) => {
     );
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
@@ -383,9 +377,7 @@ const uploadImage = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(0, path));
   } catch (err) {
     console.log(err);
-    return res
-      .status(400)
-      .json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 module.exports = {
