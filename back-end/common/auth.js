@@ -5,6 +5,7 @@ const generateAccessToken = (user) => {
   const headers = {
     id: user._id,
     name: user.name,
+    role: user.role,
   };
   return jwt.sign(headers, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "1800s",

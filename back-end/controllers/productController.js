@@ -1,5 +1,4 @@
 const multer = require("multer");
-const fs = require("fs");
 const Guid = require("guid");
 
 const Utils = require("../common/utils");
@@ -56,8 +55,19 @@ const getAllProducts = async (req, res) => {
     products = products
       .filter((product) => product.isDeleted === false)
       .slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
+    //Each product will be a capacitiesAndPrices, if a product has 3 Each product will be a capacitiesAndPrices then it will create 3 products
+    const data = products.flatMap((product) => {
+      return product.capacitiesAndPrices.map((capacityAndPrice) => {
+        delete product.capacitiesAndPrices;
+        return {
+          ...product,
+          capacities: capacityAndPrice.capacity,
+          price: capacityAndPrice.price,
+        };
+      });
+    });
 
-    return res.json(Utils.createSuccessResponseModel(totalProducts, products));
+    return res.json(Utils.createSuccessResponseModel(data.length, data));
   } catch (err) {
     console.log(err);
     return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
@@ -151,11 +161,13 @@ const addProducts = async (req, res) => {
     // Map each product in the array to a new product instance and save it
     const newProducts = await Promise.all(
       products.map(async (product) => {
-        const { productCode, name, description, capacity, image } = product;
+        const { productCode, name, description, quantity, capacity, image } =
+          product;
         const newProduct = new Product({
           productCode,
           name,
           description,
+          quantity: quantity,
           capacitiesAndPrices: capacity,
           image: image,
         });
@@ -174,6 +186,28 @@ const addProducts = async (req, res) => {
   }
 };
 
+//update product
+const updateProduct = async (req, res) => {
+  try {
+    //update quantity for all products
+    const quantity = req.body.quantity;
+
+    //update quantity for each product in category
+    const categories = await Category.find();
+    categories.forEach(async (category) => {
+      category.products.forEach(async (product) => {
+        product.quantity = quantity;
+        await product.save();
+      });
+      await category.save();
+    });
+    return res.json(Utils.createSuccessResponseModel(0, true));
+  } catch (err) {
+    console.log(err);
+    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+  }
+};
+
 // delete product
 const deleteProduct = async (req, res) => {
   try {
@@ -185,6 +219,22 @@ const deleteProduct = async (req, res) => {
     }
     product.isDeleted = true;
     await product.save();
+    //find product in all category and delete it. If category has no product, delete category
+    const categories = await Category.find();
+    categories.forEach(async (category) => {
+      const index = category.products.findIndex(
+        (p) => p.productCode === req.params.productCode
+      );
+      if (index !== -1) {
+        //change isDelete of product to true
+        category.products[index].isDeleted = true;
+        if (category.products.length === 0) {
+          category.isDeleted = true;
+        }
+        await category.save();
+      }
+    });
+
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
     console.log(err);
@@ -305,6 +355,7 @@ module.exports = {
   getAllProducts: getAllProducts,
   getBestSeller: getBestSeller,
   addProduct: addProducts,
+  updateProduct: updateProduct,
   deleteProduct: deleteProduct,
   getProductByCategory: getProductByCategory,
   getProductDetail: getDetailProduct,

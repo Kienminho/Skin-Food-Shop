@@ -13,6 +13,7 @@ router.get("/get-best-seller", productController.getBestSeller);
 //search product by name
 router.get("/search-product", productController.searchProduct);
 router.post("/add-product", productController.addProduct);
+router.put("/update-product", productController.updateProduct);
 router.delete("/delete-product/:productCode", productController.deleteProduct);
 //using query params to filter products by category and price range
 router.get("/get-products-by-category", productController.getProductByCategory);
@@ -27,4 +28,5 @@ router.post(
   productController.upload.single("image"),
   productController.uploadImage
 );
+
 module.exports = router;

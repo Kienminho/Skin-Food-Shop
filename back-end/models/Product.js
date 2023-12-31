@@ -20,7 +20,8 @@ const ProductSchema = new mongoose.Schema({
   capacitiesAndPrices: [CapacityPrice.schema],
   quantity: {
     type: Number,
-    required: true,
+    default: 0,
+    required: false,
   },
   isDeleted: {
     type: Boolean,
