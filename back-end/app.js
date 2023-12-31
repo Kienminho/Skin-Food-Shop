@@ -12,6 +12,7 @@ const RedisStore = require("connect-redis").default;
 const app = express();
 
 //middleware
+app.set("trust proxy", 1);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
