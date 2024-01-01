@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: "/images/avatar.png",
+    default: "https://skin-food-store.onrender.com/images/avatar.png",
   },
   created_at: {
     type: Date,
