@@ -67,12 +67,14 @@ const handleRegister = async (req, res) => {
   const existUser = await User.findOne({ phone: phone, isDeleted: false });
   //check user exist
   if (existUser != null) {
-    return res.json(
-      Utils.createResponseModel(
-        400,
-        `Người dùng đã tồn tại tài khoản với số điện thoại ${phone}.`
-      )
-    );
+    return res
+      .status(400)
+      .json(
+        Utils.createResponseModel(
+          400,
+          `Người dùng đã tồn tại tài khoản với số điện thoại ${phone}.`
+        )
+      );
   }
 
   try {
@@ -85,22 +87,15 @@ const handleRegister = async (req, res) => {
     return res.json(Utils.createSuccessResponseModel(1, user._id));
   } catch (error) {
     console.log("userController-Line 31: " + error.message);
-    return res.json(
-      Utils.createErrorResponseModel(error.message, error.message)
-    );
+    return res
+      .status(500)
+      .json(Utils.createErrorResponseModel(error.message, error.message));
   }
 };
 
 const updateInfoUser = async (req, res) => {
   const user = await User.findById(req.user.id);
-  if (!user) {
-    return res.json(
-      Utils.createResponseModel(
-        400,
-        `Vui lòng đăng nhập để cập nhật thông tin cá nhân.`
-      )
-    );
-  }
+
   const newProfile = { ...user.toObject(), ...req.body };
   //using newProfile to update user
   user.email = newProfile.email;
@@ -133,43 +128,42 @@ const getInfoMine = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
-  const { oldPassword, newPassword } = req.body;
-  if (oldPassword === newPassword) {
-    return res
-      .status(400)
-      .json(
-        Utils.createErrorResponseModel(
-          `Mật khẩu mới không được trùng với mật khẩu cũ.`
-        )
-      );
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (oldPassword === newPassword) {
+      return res
+        .status(400)
+        .json(
+          Utils.createErrorResponseModel(
+            `Mật khẩu mới không được trùng với mật khẩu cũ.`
+          )
+        );
+    }
+    const user = await User.findById(req.user.id);
+
+    const isPasswordCorrect = await Utils.validatePassword(
+      oldPassword,
+      user.password
+    );
+    if (!isPasswordCorrect) {
+      return res
+        .status(400)
+        .json(
+          Utils.createResponseModel(
+            400,
+            `Mật khẩu cũ không đúng, vui lòng thử lại`
+          )
+        );
+    }
+    const hashPassword = Utils.hashPassword(newPassword);
+    user.password = hashPassword;
+    user.updated_at = new Date();
+    await user.save();
+    return res.json(Utils.createSuccessResponseModel(1, user._id));
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
-  const user = await User.findById(req.user.id);
-  if (!user) {
-    return res
-      .status(400)
-      .json(
-        Utils.createResponseModel(400, `Vui lòng đăng nhập để đổi mật khẩu.`)
-      );
-  }
-  const isPasswordCorrect = await Utils.validatePassword(
-    oldPassword,
-    user.password
-  );
-  if (!isPasswordCorrect) {
-    return res
-      .status(400)
-      .json(
-        Utils.createResponseModel(
-          400,
-          `Mật khẩu cũ không đúng, vui lòng thử lại`
-        )
-      );
-  }
-  const hashPassword = Utils.hashPassword(newPassword);
-  user.password = hashPassword;
-  user.updated_at = new Date();
-  await user.save();
-  return res.json(Utils.createSuccessResponseModel(1, user._id));
 };
 
 //get all user , role != admin, isDeleted = false
