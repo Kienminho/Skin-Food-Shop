@@ -200,6 +200,7 @@ const searchProduct = async (req, res) => {
     const { keyword, pageIndex = 1, pageSize = 9 } = req.query;
     const products = await Product.find({
       name: { $regex: keyword, $options: "i" },
+      isDeleted: false,
     })
       .skip((pageIndex - 1) * pageSize)
       .limit(parseInt(pageSize));
