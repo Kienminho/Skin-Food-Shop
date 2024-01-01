@@ -37,6 +37,9 @@ const createPaymentIntent = async (req, res) => {
           totalPrice: p.quantity * product.price,
         });
         await invoiceItem.save();
+        //minus the number of products sold
+        product.quantity -= p.quantity;
+        await product.save();
       })
     );
     return res.json(Utils.createSuccessResponseModel());
