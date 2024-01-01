@@ -44,6 +44,15 @@ const getAllCategories = async (req, res) => {
 
 const addCategory = async (req, res) => {
   try {
+    //check category exist
+    const categoryExist = await Category.findOne({
+      categoryName: req.body.name,
+    });
+    if (categoryExist) {
+      return res
+        .status(400)
+        .json(Utils.createErrorResponseModel("Danh mục đã tồn tại"));
+    }
     const category = new Category({
       name: req.body.name,
     });
