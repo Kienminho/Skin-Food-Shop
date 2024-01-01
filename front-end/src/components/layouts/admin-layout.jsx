@@ -1,34 +1,85 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, Navigate, useNavigate, NavLink } from "react-router-dom";
 import {
   ShoppingBagIcon,
   TablePropertiesIcon,
   CircleUserIcon,
-  CircleUserRoundIcon,
 } from "lucide-react";
-import { Input } from "antd";
+import { Input, Avatar, Dropdown } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 
+const items = [
+  {
+    key: "logout",
+    label: "Sign out",
+  },
+];
+
+const isAuthenticated = () => {
+  const user = JSON.parse(localStorage.getItem("skinFoodShopUser"));
+  return user && user.role === "admin";
+};
+
+const getUserInfo = () => {
+  const user = JSON.parse(localStorage.getItem("skinFoodShopUser"));
+  return user;
+};
+
 const AdminLayout = () => {
+  const navigate = useNavigate();
+
+  const logout = ({ key }) => {
+    if (key === "logout") {
+      localStorage.removeItem("skinFoodShopUser");
+      navigate("/admin/sign-in");
+    }
+  };
+
+  if (!isAuthenticated()) {
+    return <Navigate to="/admin/sign-in" />;
+  }
   return (
     <div className="h-screen w-full flex">
       <div className="min-w-[200px] bg-[#F9FBF6] px-4">
-        <img className="w-[200px]" src="/images/logo-green.png" alt="Logo" />
+        <Link to="/">
+          <img className="w-[200px]" src="/images/logo-green.png" alt="Logo" />
+        </Link>
         <div>
           <ul className="flex flex-col gap-4">
-            <li className="bg-primary-color rounded p-2 cursor-pointer text-white">
-              <Link className="flex items-center gap-2" to="/admin/products">
+            <li>
+              <NavLink
+                className={({ isActive }) => {
+                  return isActive
+                    ? "bg-primary-color text-white flex items-center gap-2 rounded p-2 cursor-pointer"
+                    : "flex items-center gap-2 rounded p-2 cursor-pointer";
+                }}
+                to="/admin/products"
+              >
                 <ShoppingBagIcon size={16} /> Sản phẩm
-              </Link>
+              </NavLink>
             </li>
-            <li className="bg-primary-color rounded p-2 cursor-pointer text-white">
-              <Link className="flex items-center gap-2">
+            <li>
+              <NavLink
+                className={({ isActive }) => {
+                  return isActive
+                    ? "bg-primary-color text-white flex items-center gap-2 rounded p-2 cursor-pointer"
+                    : "flex items-center gap-2 rounded p-2 cursor-pointer";
+                }}
+                to="/admin/categories"
+              >
                 <TablePropertiesIcon size={16} /> Danh mục
-              </Link>
+              </NavLink>
             </li>
-            <li className="bg-primary-color rounded p-2 cursor-pointer text-white">
-              <Link className="flex items-center gap-2">
+            <li>
+              <NavLink
+                className={({ isActive }) => {
+                  return isActive
+                    ? "bg-primary-color text-white flex items-center gap-2 rounded p-2 cursor-pointer"
+                    : "flex items-center gap-2 rounded p-2 cursor-pointer";
+                }}
+                to="/admin/users"
+              >
                 <CircleUserIcon size={16} /> Khách hàng
-              </Link>
+              </NavLink>
             </li>
           </ul>
         </div>
@@ -46,9 +97,13 @@ const AdminLayout = () => {
           <div className="  flex items-center gap-2">
             <div className="flex flex-col items-end">
               <div>Hi,</div>
-              <div className="font-bold text-secondary-t-black">Tên tui á</div>
+              <div className="font-bold text-secondary-t-black">
+                {getUserInfo()?.name ?? ""}
+              </div>
             </div>
-            <CircleUserRoundIcon size={48} strokeWidth={1.3} stroke="#84BC4E" />
+            <Dropdown menu={{ items, onClick: logout }} trigger={["click"]}>
+              <Avatar size="large" src={getUserInfo()?.avatar ?? ""} />
+            </Dropdown>
           </div>
         </div>
         <Outlet />

@@ -1,4 +1,5 @@
 const Utils = require("../common/utils");
+const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 const Invoice = require("../models/Invoice");
 const InvoiceItem = require("../models/InvoiceItem");
@@ -42,6 +43,9 @@ const createPaymentIntent = async (req, res) => {
         await product.save();
       })
     );
+
+    //delete cart of user if payment success
+    await Cart.deleteMany({ userId: req.user.id });
     return res.json(Utils.createSuccessResponseModel());
   } catch (err) {
     console.log(err);

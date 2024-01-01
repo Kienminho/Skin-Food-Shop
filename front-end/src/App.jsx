@@ -11,6 +11,21 @@ import Blogs from "./pages/blogs";
 import SignIn from "./pages/sign-in";
 import Products from "./pages/admin/products";
 import AdminLayout from "./components/layouts/admin-layout";
+import Categories from "./pages/admin/categories";
+import Users from "./pages/admin/users";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import AdminSignIn from "./pages/admin/admin-sign-in";
+import AdminSignUp from "./pages/admin/admin-sign-up";
+import CreateProduct from "./pages/admin/create-product";
+import Checkout from "./pages/checkout";
+import Profile from "./pages/profile";
+import Policy from "./pages/policy";
+import EditProduct from "./pages/admin/edit-product";
+
+// Create a client
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -18,12 +33,16 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/item-by-category",
+    path: "/categories/:categoryName",
     element: <ItemByCategory />,
   },
   {
     path: "/cart",
     element: <Cart />,
+  },
+  {
+    path: "/products",
+    element: <ItemByCategory />,
   },
   {
     path: "/products/:id",
@@ -42,6 +61,26 @@ const router = createBrowserRouter([
     element: <SignIn />,
   },
   {
+    path: "/admin/sign-in",
+    element: <AdminSignIn />,
+  },
+  {
+    path: "/admin/sign-up",
+    element: <AdminSignUp />,
+  },
+  {
+    path: "/checkout",
+    element: <Checkout />,
+  },
+  {
+    path: "/profile",
+    element: <Profile />,
+  },
+  {
+    path: "/policy",
+    element: <Policy />,
+  },
+  {
     path: "/admin",
     element: <AdminLayout />,
     children: [
@@ -49,23 +88,46 @@ const router = createBrowserRouter([
         path: "products",
         element: <Products />,
       },
+      {
+        path: "products/:id",
+        element: <EditProduct />,
+      },
+      {
+        path: "products/create",
+        element: <CreateProduct />,
+      },
+
+      {
+        path: "categories",
+        element: <Categories />,
+      },
+      {
+        path: "users",
+        element: <Users />,
+      },
     ],
   },
 ]);
 
 function App() {
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#84BC4E",
-        },
-      }}
-    >
-      <StyleProvider hashPriority="high">
-        <RouterProvider router={router} />
-      </StyleProvider>
-    </ConfigProvider>
+    <QueryClientProvider client={queryClient}>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: "#84BC4E",
+          },
+        }}
+      >
+        <StyleProvider hashPriority="high">
+          <RouterProvider router={router} />
+          <ReactQueryDevtools
+            initialIsOpen={false}
+            buttonPosition="bottom-left"
+          />
+        </StyleProvider>
+      </ConfigProvider>
+    </QueryClientProvider>
   );
 }
 
