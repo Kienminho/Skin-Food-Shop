@@ -46,9 +46,11 @@ const handleLogin = async (req, res) => {
     user.password
   );
   if (!isPasswordCorrect) {
-    return res.json(
-      Utils.createResponseModel(400, `Mật khẩu không đúng, vui lòng thử lại`)
-    );
+    return res
+      .status(400)
+      .json(
+        Utils.createResponseModel(400, `Mật khẩu không đúng, vui lòng thử lại`)
+      );
   }
   user.accessToken = Auth.generateAccessToken(user);
   user.refreshToken = Auth.generateRefreshToken(user);
