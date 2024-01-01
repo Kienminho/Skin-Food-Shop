@@ -1,4 +1,5 @@
 import { MailIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -71,9 +72,9 @@ const Footer = () => {
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="text-white text-base font-bold mb-2">CHÍNH SÁCH</h3>
-            <a href="#" className="text-white text-base">
+            <Link to="/policy" className="text-white text-base">
               Chính sách đổi trả
-            </a>
+            </Link>
             <a href="#" className="text-white text-base">
               Chính sách giao hàng
             </a>
