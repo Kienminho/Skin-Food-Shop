@@ -3,7 +3,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: false,
-    default: "example@gmail.com",
+    unique: false,
   },
   phone: {
     type: String,

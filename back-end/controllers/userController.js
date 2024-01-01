@@ -81,10 +81,12 @@ const handleRegister = async (req, res) => {
 
   try {
     const hashPassword = Utils.hashPassword(password);
+    const number = await User.countDocuments();
     // Tạo một user mới
     const user = await User.create({
       phone: phone,
       password: hashPassword,
+      email: `user_${number}@gmail.com`,
     });
     return res.json(Utils.createSuccessResponseModel(1, user._id));
   } catch (error) {
