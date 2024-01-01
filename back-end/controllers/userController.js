@@ -92,7 +92,7 @@ const handleRegister = async (req, res) => {
 };
 
 const updateInfoUser = async (req, res) => {
-  const { email, name, birthday, address } = req.body;
+  const { email, name, birthday, address, image } = req.body;
   const user = await User.findById(req.user.id);
   if (!user) {
     return res.json(
@@ -106,6 +106,7 @@ const updateInfoUser = async (req, res) => {
   user.name = name;
   user.birthday = new Date(birthday);
   user.address = address;
+  user.avatar = image;
   user.updated_at = new Date();
   await user.save();
   const userWithoutPassword = { ...user.toObject() };
