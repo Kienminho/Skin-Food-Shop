@@ -29,7 +29,9 @@ const getAllCategories = async (req, res) => {
     const categories = await Category.find({ isDeleted: false });
     const data = categories.map((category) => {
       return {
+        id: category._id,
         name: category.name,
+        totalProducts: category.products.length,
       };
     });
 
@@ -348,7 +350,7 @@ const getRelatedProducts = async (req, res) => {
         if (category.products.find((p) => p._id.toString() === req.params.id)) {
           const categoryProducts = category.products
             .filter((p) => p._id.toString() !== req.params.id)
-            .slice(0, 5);
+            .slice(0, 4);
           if (categoryProducts.length > 0) {
             return {
               category: category.name, // Assuming category has a name property
