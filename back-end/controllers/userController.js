@@ -16,9 +16,9 @@ const checkPermission = (req, res, next) => {
 const refreshToken = async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) {
-    return res.json(
-      Utils.createResponseModel(400, `Người dùng không tồn tại.`)
-    );
+    return res
+      .status(404)
+      .json(Utils.createResponseModel(404, `Người dùng không tồn tại.`));
   }
   user.accessToken = Auth.generateAccessToken(user);
   user.refreshToken = Auth.generateRefreshToken(user);
@@ -86,7 +86,7 @@ const handleRegister = async (req, res) => {
   } catch (error) {
     console.log("userController-Line 31: " + error.message);
     return res.json(
-      Utils.createErrorResponseModel("Vui lòng thử lại", error.message)
+      Utils.createErrorResponseModel(error.message, error.message)
     );
   }
 };
@@ -116,12 +116,14 @@ const updateInfoUser = async (req, res) => {
 const getInfoMine = async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) {
-    return res.json(
-      Utils.createResponseModel(
-        400,
-        `Vui lòng đăng nhập để lấy thông tin cá nhân.`
-      )
-    );
+    return res
+      .status(400)
+      .json(
+        Utils.createResponseModel(
+          400,
+          `Vui lòng đăng nhập để lấy thông tin cá nhân.`
+        )
+      );
   }
   const userWithoutPassword = { ...user.toObject() };
   delete userWithoutPassword.password;
@@ -131,26 +133,35 @@ const getInfoMine = async (req, res) => {
 const changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   if (oldPassword === newPassword) {
-    return res.json(
-      Utils.createErrorResponseModel(
-        `Mật khẩu mới không được trùng với mật khẩu cũ.`
-      )
-    );
+    return res
+      .status(400)
+      .json(
+        Utils.createErrorResponseModel(
+          `Mật khẩu mới không được trùng với mật khẩu cũ.`
+        )
+      );
   }
   const user = await User.findById(req.user.id);
   if (!user) {
-    return res.json(
-      Utils.createResponseModel(400, `Vui lòng đăng nhập để đổi mật khẩu.`)
-    );
+    return res
+      .status(400)
+      .json(
+        Utils.createResponseModel(400, `Vui lòng đăng nhập để đổi mật khẩu.`)
+      );
   }
   const isPasswordCorrect = await Utils.validatePassword(
     oldPassword,
     user.password
   );
   if (!isPasswordCorrect) {
-    return res.json(
-      Utils.createResponseModel(400, `Mật khẩu cũ không đúng, vui lòng thử lại`)
-    );
+    return res
+      .status(400)
+      .json(
+        Utils.createResponseModel(
+          400,
+          `Mật khẩu cũ không đúng, vui lòng thử lại`
+        )
+      );
   }
   const hashPassword = Utils.hashPassword(newPassword);
   user.password = hashPassword;
@@ -180,7 +191,7 @@ const getAllUsers = async (req, res) => {
     );
   } catch (error) {
     console.log(error);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(error.message));
   }
 };
 
@@ -188,16 +199,16 @@ const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.json(
-        Utils.createErrorResponseModel("Người dùng không tồn tại")
-      );
+      return res
+        .status(404)
+        .json(Utils.createErrorResponseModel("Người dùng không tồn tại"));
     }
     user.isDeleted = true;
     await user.save();
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (error) {
     console.log(error);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(error.message));
   }
 };
 

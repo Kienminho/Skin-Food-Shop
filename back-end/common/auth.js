@@ -26,11 +26,15 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader?.split(" ")[1];
   if (token == null)
-    return res.json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
+    return res
+      .status(401)
+      .json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err)
-      return res.json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
+      return res
+        .status(401)
+        .json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
     req.user = user;
     next();
   });
@@ -41,15 +45,19 @@ const authenticateTokenAdmin = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader?.split(" ")[1];
   if (token == null)
-    return res.json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
+    return res
+      .status(401)
+      .json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err)
-      return res.json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
+      return res
+        .status(401)
+        .json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
     if (user.role !== "admin")
-      return res.json(
-        Utils.createResponseModel(401, "Bạn không có quyền truy cập.")
-      );
+      return res
+        .status(403)
+        .json(Utils.createResponseModel(401, "Bạn không có quyền truy cập."));
     req.user = user;
     next();
   });
@@ -58,10 +66,14 @@ const authenticateTokenAdmin = (req, res, next) => {
 const authenticateRefreshToken = (req, res, next) => {
   const refreshToken = req.body.refreshToken;
   if (refreshToken == null)
-    return res.json(Utils.createResponseModel(400, "Data not found."));
+    return res
+      .status(404)
+      .json(Utils.createResponseModel(404, "Data not found."));
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
     if (err)
-      return res.json(Utils.createResponseModel(401, "Bạn cần đăng nhập lại."));
+      return res
+        .status(401)
+        .json(Utils.createResponseModel(401, "Bạn cần đăng nhập lại."));
     req.user = user;
     next();
   });

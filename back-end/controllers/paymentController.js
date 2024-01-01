@@ -37,12 +37,15 @@ const createPaymentIntent = async (req, res) => {
           totalPrice: p.quantity * product.price,
         });
         await invoiceItem.save();
+        //minus the number of products sold
+        product.quantity -= p.quantity;
+        await product.save();
       })
     );
     return res.json(Utils.createSuccessResponseModel());
   } catch (err) {
     console.log(err);
-    return res.json(Utils.createErrorResponseModel("Vui lòng thử lại"));
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
   }
 };
 
