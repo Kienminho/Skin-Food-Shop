@@ -88,17 +88,26 @@ const deleteCategory = async (req, res) => {
 
 const updateNameCategory = async (req, res) => {
   try {
-    const category = await Category.findOne({
-      _id: req.body.id,
-      isDeleted: false,
+    const { name, id } = req.body;
+    const categoryExist = await Category.exists({
+      _id: { $ne: id },
+      name: name,
     });
-    if (!category || category === null) {
+    if (categoryExist) {
+      return res
+        .status(400)
+        .json(Utils.createErrorResponseModel("Danh mục đã tồn tại"));
+    }
+    const category = await Category.findOneAndUpdate(
+      { _id: id, isDeleted: false },
+      { name },
+      { new: true }
+    );
+    if (!category) {
       return res
         .status(404)
         .json(Utils.createErrorResponseModel("Danh mục không tồn tại"));
     }
-    category.name = req.body.name;
-    await category.save();
     return res.json(Utils.createSuccessResponseModel(0, true));
   } catch (err) {
     console.log(err);

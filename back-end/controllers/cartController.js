@@ -77,9 +77,8 @@ const updateProductInCart = async (req, res) => {
     );
 
     if (existingProduct) {
-      existingProduct.quantity += quantity;
-      existingProduct.price =
-        existingProduct.capacityPrice * existingProduct.quantity;
+      existingProduct.quantity = quantity;
+      existingProduct.price = existingProduct.capacityPrice * quantity;
     }
 
     // If quantity is 0, remove product from cart
