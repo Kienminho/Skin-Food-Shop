@@ -1,4 +1,4 @@
-import { Link, Outlet, Navigate, useNavigate } from "react-router-dom";
+import { Link, Outlet, Navigate, useNavigate, NavLink } from "react-router-dom";
 import {
   ShoppingBagIcon,
   TablePropertiesIcon,
@@ -40,23 +40,46 @@ const AdminLayout = () => {
   return (
     <div className="h-screen w-full flex">
       <div className="min-w-[200px] bg-[#F9FBF6] px-4">
-        <img className="w-[200px]" src="/images/logo-green.png" alt="Logo" />
+        <Link to="/">
+          <img className="w-[200px]" src="/images/logo-green.png" alt="Logo" />
+        </Link>
         <div>
           <ul className="flex flex-col gap-4">
-            <li className="bg-primary-color rounded p-2 cursor-pointer text-white">
-              <Link className="flex items-center gap-2" to="/admin/products">
+            <li>
+              <NavLink
+                className={({ isActive }) => {
+                  return isActive
+                    ? "bg-primary-color text-white flex items-center gap-2 rounded p-2 cursor-pointer"
+                    : "flex items-center gap-2 rounded p-2 cursor-pointer";
+                }}
+                to="/admin/products"
+              >
                 <ShoppingBagIcon size={16} /> Sản phẩm
-              </Link>
+              </NavLink>
             </li>
-            <li className="bg-primary-color rounded p-2 cursor-pointer text-white">
-              <Link className="flex items-center gap-2" to="/admin/categories">
+            <li>
+              <NavLink
+                className={({ isActive }) => {
+                  return isActive
+                    ? "bg-primary-color text-white flex items-center gap-2 rounded p-2 cursor-pointer"
+                    : "flex items-center gap-2 rounded p-2 cursor-pointer";
+                }}
+                to="/admin/categories"
+              >
                 <TablePropertiesIcon size={16} /> Danh mục
-              </Link>
+              </NavLink>
             </li>
-            <li className="bg-primary-color rounded p-2 cursor-pointer text-white">
-              <Link className="flex items-center gap-2" to="/admin/users">
+            <li>
+              <NavLink
+                className={({ isActive }) => {
+                  return isActive
+                    ? "bg-primary-color text-white flex items-center gap-2 rounded p-2 cursor-pointer"
+                    : "flex items-center gap-2 rounded p-2 cursor-pointer";
+                }}
+                to="/admin/users"
+              >
                 <CircleUserIcon size={16} /> Khách hàng
-              </Link>
+              </NavLink>
             </li>
           </ul>
         </div>
@@ -79,10 +102,7 @@ const AdminLayout = () => {
               </div>
             </div>
             <Dropdown menu={{ items, onClick: logout }} trigger={["click"]}>
-              <Avatar
-                size="large"
-                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-              />
+              <Avatar size="large" src={getUserInfo()?.avatar ?? ""} />
             </Dropdown>
           </div>
         </div>

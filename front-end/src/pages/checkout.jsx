@@ -12,9 +12,22 @@ import {
   Form,
   Divider,
 } from "antd";
+import { useCarts } from "../hooks/cart/use-carts";
+import { formatPriceVND } from "./product-detail";
+import { useProfile } from "../hooks/user/use-profile";
 
 const Checkout = () => {
   const [form] = Form.useForm();
+
+  const { data, isLoading } = useCarts();
+  const { data: profile } = useProfile();
+
+  const totalPrice = (data?.data ?? []).reduce((total, current) => {
+    return (total += current.capacityPrice);
+  }, 0);
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <div>
       <Header />
@@ -23,7 +36,7 @@ const Checkout = () => {
         <div className="container mx-auto">
           <div className="flex gap-8">
             <div className="flex-grow">
-              <p className="font-bold text-3xl mb-6">Hi, Jessica</p>
+              <p className="font-bold text-3xl mb-6">Hi, {profile.data.name}</p>
               <p className="font-bold text-3xl mb-6">Thông tin vận chuyển</p>
               <Row gutter={[32, 16]}>
                 <Col span={12}>
@@ -52,7 +65,7 @@ const Checkout = () => {
                 </Col>
               </Row>
               <p className="font-bold text-3xl my-6">Hình thức thanh toán</p>
-              <Radio.Group className="w-full mb-4">
+              <Radio.Group className="w-full mb-4" defaultValue={1}>
                 <Space className="w-full" direction="vertical">
                   <div className="p-4 border border-primary-color rounded-md w-full">
                     <Radio value={1}>
@@ -80,22 +93,26 @@ const Checkout = () => {
             </div>
             <div className="min-w-[400px]">
               <h1 className="font-bold text-3xl mb-6">Giỏ hàng</h1>
-              <div className="flex flex-col gap-4 mb-6">
-                {[1, 2, 3].map((item) => {
+              <div className="flex flex-col gap-4 mb-6 max-h-[422px] overflow-auto">
+                {data?.data.map((item) => {
                   return (
                     <div key={item} className="flex items-center gap-4">
                       <img
                         className="w-[130px] h-[130px]"
-                        src="/images/anua.png"
+                        src={item.productInfo.image}
                         alt="Logo"
                       />
                       <div>
-                        <p className="font-semibold text-lg">Tên sản phẩm</p>
-                        <div className="text-base">Biến thể</div>
-                        <div className="text-lg font-bold">215.000 ₫ </div>
-                        <div className="text-sm text-gray-400 line-through">
-                          215.000 ₫{" "}
+                        <p className="font-semibold text-lg">
+                          {item.productInfo.name}
+                        </p>
+                        {/* <div className="text-base">Biến thể</div> */}
+                        <div className="text-lg font-bold">
+                          {formatPriceVND(item.capacityPrice)}
                         </div>
+                        {/* <div className="text-sm text-gray-400 line-through">
+                          215.000 ₫{" "}
+                        </div> */}
                       </div>
                     </div>
                   );
@@ -108,7 +125,9 @@ const Checkout = () => {
               <Divider />
               <div className="flex items-center justify-between mb-6">
                 <span className="font-bold text-xl">Tạm tính</span>
-                <span className="font-semibold text-base">500.000đ</span>
+                <span className="font-semibold text-base">
+                  {formatPriceVND(totalPrice)}
+                </span>
               </div>
               <div className="flex items-center justify-between mb-6">
                 <span className="font-bold text-xl">Giảm giá</span>
@@ -116,12 +135,14 @@ const Checkout = () => {
               </div>
               <div className="flex items-center justify-between mb-6">
                 <span className="font-bold text-xl">Phí giao hàng</span>
-                <span className="font-semibold text-base">500.000đ</span>
+                <span className="font-semibold text-base">0</span>
               </div>
               <Divider />
               <div className="flex items-center justify-between mb-6">
                 <span className="font-bold text-xl">Tổng</span>
-                <span className="font-semibold text-base">520.000đ</span>
+                <span className="font-semibold text-base">
+                  {formatPriceVND(totalPrice)}
+                </span>
               </div>
             </div>
           </div>

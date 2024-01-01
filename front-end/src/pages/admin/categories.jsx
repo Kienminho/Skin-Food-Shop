@@ -1,66 +1,110 @@
-import { Select, Button, Table } from "antd";
+import { Select, Button, Table, Popconfirm, message } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-
-const dataSource = [
-  {
-    key: "1",
-    name: "Mike",
-    age: 32,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "3",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "4",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-];
-
-const columns = [
-  {
-    title: "Tên danh mục",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Số lượng sản phẩm",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Trạng thái",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Thao tác",
-    dataIndex: "action",
-    key: "action",
-    width: 50,
-    render: () => {
-      return (
-        <div className="flex items-center justify-between gap-4">
-          <EditOutlined style={{ fontSize: 20 }} />
-          <DeleteOutlined style={{ fontSize: 20 }} />
-        </div>
-      );
-    },
-  },
-];
+import { useState } from "react";
+import { useCategories } from "../../hooks/use-categories";
+import CategoryModal from "../../components/category/category-modal";
+import { useAddCategory } from "../../hooks/use-add-category";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDeleteCategory } from "../../hooks/use-delete-category";
+import { useUpdateCategory } from "../../hooks/use-update-category";
 
 const Categories = () => {
+  const queryClient = useQueryClient();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [messageApi, holder] = message.useMessage();
+
+  const { data, isLoading } = useCategories();
+  const { mutate: addCategory } = useAddCategory();
+  const { mutate: deleteCategory } = useDeleteCategory();
+  const { mutate: updateCategory } = useUpdateCategory();
+
+  const handleOk = (categoryName) => {
+    if (!selectedItem) {
+      addCategory(categoryName, {
+        onSuccess: () => {
+          setIsModalOpen(false);
+          queryClient.invalidateQueries(["categories"]);
+          messageApi.success("Thêm danh mục thành công");
+        },
+        onError: () => {
+          setIsModalOpen(false);
+          messageApi.error("Thêm danh mục thất bại");
+        },
+      });
+    } else {
+      updateCategory(
+        { id: selectedItem.id, name: categoryName.name },
+        {
+          onSuccess: () => {
+            setIsModalOpen(false);
+            queryClient.invalidateQueries(["categories"]);
+            messageApi.success("Chỉnh sửa danh mục thành công");
+          },
+          onError: () => {
+            setIsModalOpen(false);
+            messageApi.success("Chỉnh sửa danh mục thất bại");
+          },
+        }
+      );
+    }
+  };
+
+  const columns = [
+    {
+      title: "Tên danh mục",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Số lượng sản phẩm",
+      dataIndex: "totalProducts",
+      key: "totalProducts",
+    },
+
+    {
+      title: "Thao tác",
+      dataIndex: "action",
+      key: "action",
+      width: 50,
+      render: (text, record) => {
+        return (
+          <div className="flex items-center justify-between gap-4">
+            {holder}
+            <EditOutlined
+              style={{ fontSize: 20 }}
+              onClick={() => {
+                setSelectedItem(record);
+                setIsModalOpen(true);
+              }}
+            />
+            <Popconfirm
+              title="Xoá danh mục"
+              description="Bạn có chắc chắn muốn xoá danh mục này?"
+              onConfirm={() => {
+                deleteCategory(record.id, {
+                  onSuccess: () => {
+                    queryClient.invalidateQueries(["categories"]);
+                    messageApi.success("Xoá danh mục thành công");
+                  },
+                  onError: () => {
+                    queryClient.invalidateQueries(["categories"]);
+                    messageApi.error("Xoá danh mục thất bại");
+                  },
+                });
+              }}
+              okText="Có"
+              cancelText="Không"
+            >
+              <DeleteOutlined style={{ fontSize: 20 }} />
+            </Popconfirm>
+          </div>
+        );
+      },
+    },
+  ];
+
+  if (isLoading) return <div>Loading...</div>;
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between mb-6">
@@ -76,13 +120,21 @@ const Categories = () => {
             },
           ]}
         />
-        <Button type="primary" icon={<PlusOutlined />}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setIsModalOpen(true)}
+        >
           Thêm
         </Button>
       </div>
-      <div>
-        <Table rowSelection={{}} dataSource={dataSource} columns={columns} />;
-      </div>
+      <Table dataSource={data?.data ?? []} columns={columns} rowKey="id" />;
+      <CategoryModal
+        selectedItem={selectedItem}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        onSubmit={handleOk}
+      />
     </div>
   );
 };

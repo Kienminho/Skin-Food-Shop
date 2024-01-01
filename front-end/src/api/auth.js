@@ -14,6 +14,6 @@ export const authApi = {
     });
   },
   getAccessToken(refreshToken) {
-    return axiosClient.get("/user/getAccessToken", { refreshToken });
+    return axiosClient.get("/user/refresh-token", { refreshToken });
   },
 };

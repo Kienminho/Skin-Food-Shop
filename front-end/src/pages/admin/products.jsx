@@ -1,75 +1,118 @@
-import { Select, Button, Table } from "antd";
+import { Select, Button, Table, Popconfirm, message } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useProducts } from "../../hooks/use-products";
 import { useNavigate } from "react-router-dom";
-
-const columns = [
-  {
-    title: "Tên sản phẩm",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Thương hiệu",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "SKU",
-    dataIndex: "productCode",
-    key: "productCode",
-  },
-  {
-    title: "Danh mục",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Giá",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "Có sẵn",
-    dataIndex: "quantity",
-    key: "quantity",
-  },
-  {
-    title: "Thao tác",
-    dataIndex: "action",
-    key: "action",
-    width: 50,
-    render: () => {
-      return (
-        <div className="flex items-center justify-between gap-4">
-          <EditOutlined style={{ fontSize: 20 }} />
-          <DeleteOutlined style={{ fontSize: 20 }} />
-        </div>
-      );
-    },
-  },
-];
+import { useDeleteProduct } from "../../hooks/useDeleteProduct";
+import { useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { formatPriceVND } from "../product-detail";
 
 const Products = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data, isLoading } = useProducts();
+  const [messageApi, contextHolder] = message.useMessage();
+  const [sortOrder, setSortOrder] = useState(null);
 
-  console.log("data", data);
+  const { mutate } = useDeleteProduct();
+
+  const onConfirm = (id) => {
+    mutate(id, {
+      onSuccess() {
+        messageApi.success("Xoá sản phẩm thành công");
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      },
+      onError() {
+        messageApi.error("Xoá sản phẩm thất bại");
+      },
+    });
+  };
+
+  const columns = [
+    {
+      title: "Tên sản phẩm",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "SKU",
+      dataIndex: "productCode",
+      key: "productCode",
+    },
+    {
+      title: "Danh mục",
+      dataIndex: "categoryName",
+      key: "categoryName",
+    },
+    {
+      title: "Giá",
+      dataIndex: "price",
+      key: "price",
+      render: (text) => <span>{formatPriceVND(text)}</span>,
+    },
+    {
+      title: "Có sẵn",
+      dataIndex: "quantity",
+      key: "quantity",
+    },
+    {
+      title: "Thao tác",
+      dataIndex: "action",
+      key: "action",
+      width: 50,
+      render: (text, record) => {
+        return (
+          <div className="flex items-center justify-between gap-4">
+            <EditOutlined
+              style={{ fontSize: 20 }}
+              onClick={() => navigate(`/admin/products/${record._id}`)}
+            />
+            <Popconfirm
+              title="Xoá sản phẩm?"
+              description="Bạn có chắc chắn muốn xoá sản phẩm này?"
+              onConfirm={() => onConfirm(record._id)}
+              okText="Có"
+              cancelText="Không"
+            >
+              <DeleteOutlined style={{ fontSize: 20 }} />
+            </Popconfirm>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const products = useMemo(() => {
+    if (!data) return [];
+    if (sortOrder === "descPrice") {
+      return (data?.data ?? []).sort((a, b) => b.price - a.price);
+    }
+    return (data?.data ?? []).sort((a, b) => a.price - b.price);
+  }, [sortOrder, data]);
+
+  console.log("products", products);
 
   return (
     <div className="mt-4">
+      {contextHolder}
       <div className="flex items-center justify-between mb-6">
         <Select
-          defaultValue="sort"
+          value={sortOrder}
           style={{
-            width: 120,
+            width: 200,
           }}
+          placeholder="Sắp xếp"
           options={[
             {
-              value: "sort",
-              label: "Sắp xếp",
+              value: "ascPrice",
+              label: "Giá: Thấp - Cao",
+            },
+            {
+              value: "descPrice",
+              label: "Giá: Cao - Thấp",
             },
           ]}
+          onChange={(value) => setSortOrder(value)}
         />
         <Button
           type="primary"
@@ -82,10 +125,10 @@ const Products = () => {
       <div>
         <Table
           loading={isLoading}
-          rowSelection={{}}
-          dataSource={data?.data ?? []}
+          dataSource={products}
           columns={columns}
           rowKey="_id"
+          // pagination={{ pageSize: 20 }}
         />
       </div>
     </div>

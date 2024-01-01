@@ -32,7 +32,7 @@ axiosClient.interceptors.request.use(
     // Do something before request is sent
     const token = getLocalAccessToken();
     if (token) {
-      config.headers.Authorization = token;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },

@@ -2,33 +2,6 @@ import { Select, Button, Table } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useUsers } from "../../hooks/use-users";
 
-const dataSource = [
-  {
-    key: "1",
-    name: "Mike",
-    age: 32,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "3",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-  {
-    key: "4",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-];
-
 const columns = [
   {
     title: "Tên khách hàng",
@@ -36,19 +9,19 @@ const columns = [
     key: "name",
   },
   {
-    title: "Địa điểm",
-    dataIndex: "age",
-    key: "age",
+    title: "Số điện thoại",
+    dataIndex: "phone",
+    key: "phone",
   },
   {
     title: "Email",
-    dataIndex: "address",
+    dataIndex: "email",
     key: "address",
   },
   {
     title: "Số đơn hàng",
-    dataIndex: "address",
-    key: "address",
+    dataIndex: "totalOrders",
+    key: "totalOrders",
   },
   {
     title: "Trạng thái",
@@ -73,9 +46,11 @@ const columns = [
 ];
 
 const Users = () => {
-  const { data } = useUsers();
+  const { data, isLoading } = useUsers();
 
-  console.log("data", data);
+  console.log(data?.data);
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="mt-4">
@@ -97,7 +72,13 @@ const Users = () => {
         </Button>
       </div>
       <div>
-        <Table rowSelection={{}} dataSource={dataSource} columns={columns} />;
+        <Table
+          rowSelection={{}}
+          dataSource={data?.data ?? []}
+          columns={columns}
+          rowKey="_id"
+        />
+        ;
       </div>
     </div>
   );

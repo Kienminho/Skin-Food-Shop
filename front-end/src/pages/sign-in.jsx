@@ -1,12 +1,66 @@
-import { Button, Checkbox, Form, Input, Breadcrumb } from "antd";
-import { Link } from "react-router-dom";
+import { Button, Checkbox, Form, Input, Breadcrumb, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
+import { useSignIn } from "../hooks/use-sign-in";
+import { useSignUp } from "../hooks/use-sign-up";
+
+const getInitialValues = () => {
+  return JSON.parse(localStorage.getItem("skinFoodShopCustomer"));
+};
 
 const SignIn = () => {
+  const [signUpForm] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+  const { mutate } = useSignIn();
+  const navigate = useNavigate();
+  const { mutate: signUp } = useSignUp();
+
+  const onFinish = (values) => {
+    mutate(values, {
+      onSuccess(response) {
+        console.log(response)
+        localStorage.setItem("skinFoodShopUser", JSON.stringify(response.data));
+        messageApi.open({
+          type: "success",
+          content: "Đăng nhập thành công",
+        });
+        navigate("/");
+      },
+
+      onError() {
+        messageApi.open({
+          type: "error",
+          content: "Đăng nhập thật bại",
+        });
+      },
+    });
+  };
+
+  const onSignUp = (values) => {
+    signUp(values, {
+      onSuccess() {
+        messageApi.success("Đăng ký tài khoản thành công");
+        signUpForm.resetFields();
+      },
+      onError() {
+        messageApi.error("Đăng ký tài khoản thất bại");
+      },
+    });
+  };
+
+  const onValuesChange = (_, allValues) => {
+    if (allValues.remember) {
+      localStorage.setItem("skinFoodShopCustomer", JSON.stringify(allValues));
+    } else {
+      localStorage.removeItem("skinFoodShopCustomer");
+    }
+  };
+
   return (
     <>
+      {contextHolder}
       <Header />
       <Navbar />
       <div className="container mx-auto">
@@ -28,20 +82,20 @@ const SignIn = () => {
               <h1 className="text-4xl font-bold mb-10">Đăng nhập</h1>
               <Form
                 name="basic"
-                initialValues={{
-                  remember: true,
-                }}
                 autoComplete="off"
                 layout="vertical"
                 size="large"
+                onValuesChange={onValuesChange}
+                onFinish={onFinish}
+                initialValues={getInitialValues()}
               >
                 <Form.Item
-                  label="Username"
-                  name="username"
+                  label="Phone"
+                  name="phone"
                   rules={[
                     {
                       required: true,
-                      message: "Please input your username!",
+                      message: "Vui lòng không để trống trường này!",
                     },
                   ]}
                 >
@@ -54,7 +108,7 @@ const SignIn = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please input your password!",
+                      message: "Vui lòng không để trống trường này!",
                     },
                   ]}
                 >
@@ -91,14 +145,16 @@ const SignIn = () => {
                 autoComplete="off"
                 layout="vertical"
                 size="large"
+                onFinish={onSignUp}
+                form={signUpForm}
               >
                 <Form.Item
-                  label="Username"
-                  name="username"
+                  label="Phone"
+                  name="phone"
                   rules={[
                     {
                       required: true,
-                      message: "Please input your username!",
+                      message: "Vui lòng không để trống trường này!",
                     },
                   ]}
                 >
@@ -111,7 +167,7 @@ const SignIn = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please input your password!",
+                      message: "Vui lòng không để trống trường này!",
                     },
                   ]}
                 >
