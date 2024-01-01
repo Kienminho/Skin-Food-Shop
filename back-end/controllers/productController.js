@@ -42,6 +42,61 @@ const getAllCategories = async (req, res) => {
   }
 };
 
+const addCategory = async (req, res) => {
+  try {
+    const category = new Category({
+      name: req.body.name,
+    });
+    await category.save();
+    return res.json(
+      Utils.createSuccessResponseModel("Thêm danh mục thành công", category)
+    );
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  try {
+    const category = await Category.findOne({
+      _id: req.params.id,
+      isDeleted: false,
+    });
+    if (!category || category === null) {
+      return res
+        .status(404)
+        .json(Utils.createErrorResponseModel("Danh mục không tồn tại"));
+    }
+    category.isDeleted = true;
+    await category.save();
+    return res.json(Utils.createSuccessResponseModel(0, true));
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
+  }
+};
+
+const updateNameCategory = async (req, res) => {
+  try {
+    const category = await Category.findOne({
+      _id: req.body.id,
+      isDeleted: false,
+    });
+    if (!category || category === null) {
+      return res
+        .status(404)
+        .json(Utils.createErrorResponseModel("Danh mục không tồn tại"));
+    }
+    category.name = req.body.name;
+    await category.save();
+    return res.json(Utils.createSuccessResponseModel(0, true));
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
+  }
+};
+
 //get all products by pageSize and pageIndex
 const getAllProducts = async (req, res) => {
   try {
@@ -386,6 +441,9 @@ const uploadImage = async (req, res) => {
 module.exports = {
   upload: upload,
   getAllCategories: getAllCategories,
+  addCategory: addCategory,
+  updateNameCategory: updateNameCategory,
+  deleteCategory: deleteCategory,
   getAllProducts: getAllProducts,
   getBestSeller: getBestSeller,
   addProduct: addProducts,
