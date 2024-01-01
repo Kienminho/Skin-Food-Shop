@@ -31,12 +31,14 @@ const handleLogin = async (req, res) => {
   const user = await User.findOne({ phone: phone, isDeleted: false });
   //check user exist
   if (!user) {
-    return res.json(
-      Utils.createResponseModel(
-        400,
-        `Người dùng không tồn tại tài khoản với số điện thoại ${phone}.`
-      )
-    );
+    return res
+      .status(400)
+      .json(
+        Utils.createResponseModel(
+          400,
+          `Người dùng không tồn tại tài khoản với số điện thoại ${phone}.`
+        )
+      );
   }
   //check password
   const isPasswordCorrect = await Utils.validatePassword(
