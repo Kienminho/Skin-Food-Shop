@@ -2,7 +2,7 @@ import { ChevronDownIcon } from "lucide-react";
 
 const Navbar = () => {
   return (
-    <nav className="container flex justify-center items-center bg-white py-4 px-10">
+    <nav className="container mx-auto flex justify-center items-center bg-white py-4 px-10">
       <ul className="flex items-center gap-8">
         <li className="text-primary-color font-bold text-xl">
           <a href="#">Trang chủ</a>
