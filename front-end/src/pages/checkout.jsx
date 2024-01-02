@@ -15,16 +15,28 @@ import {
 import { useCarts } from "../hooks/cart/use-carts";
 import { formatPriceVND } from "./product-detail";
 import { useProfile } from "../hooks/user/use-profile";
+import { useCheckout } from "../hooks/payment/use-checkout";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
 
   const { data, isLoading } = useCarts();
   const { data: profile } = useProfile();
+  const { mutate } = useCheckout();
 
   const totalPrice = (data?.data ?? []).reduce((total, current) => {
     return (total += current.capacityPrice);
   }, 0);
+
+  const onCheckout = () => {
+    mutate(null, {
+      onSuccess() {
+        navigate("/checkout-success");
+      },
+    });
+  };
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -87,8 +99,13 @@ const Checkout = () => {
                 Nếu bạn không hài lòng với sản phẩm của chúng tôi? Bạn hoàn toàn
                 có thể trả lại sản phẩm. TÌm hiểu thêm Tại đây
               </div>
-              <Button size="large" className="w-full mb-6" type="primary">
-                Thanh toán xxx (VNPAY)
+              <Button
+                size="large"
+                className="w-full mb-6"
+                type="primary"
+                onClick={onCheckout}
+              >
+                Thanh toán
               </Button>
             </div>
             <div className="min-w-[400px]">

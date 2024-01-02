@@ -23,6 +23,10 @@ import Checkout from "./pages/checkout";
 import Profile from "./pages/profile";
 import Policy from "./pages/policy";
 import EditProduct from "./pages/admin/edit-product";
+import Delivery from "./pages/delivery";
+import PrivatePolicy from "./pages/private-policy";
+import Faq from "./pages/faq";
+import CheckoutSuccess from "./pages/checkout-success";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -51,6 +55,22 @@ const router = createBrowserRouter([
   {
     path: "/tips",
     element: <Tips />,
+  },
+  {
+    path: "/delivery",
+    element: <Delivery />,
+  },
+  {
+    path: "/private-policy",
+    element: <PrivatePolicy />,
+  },
+  {
+    path: "/checkout-success",
+    element: <CheckoutSuccess />,
+  },
+  {
+    path: "/faq",
+    element: <Faq />,
   },
   {
     path: "/blogs",

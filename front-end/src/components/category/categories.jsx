@@ -4,14 +4,17 @@ const options = [
   {
     label: "Skin Care",
     value: "SkinCare",
+    imageUrl: "/images/skincare.jpg",
   },
   {
     label: "Body Care",
     value: "SkinCare",
+    imageUrl: "/images/bodycare.jpg",
   },
   {
     label: "Hair Care",
     value: "SkinCare",
+    imageUrl: "/images/haircare.jpg",
   },
 ];
 
@@ -31,25 +34,19 @@ const Categories = () => {
                 className="flex flex-col items-center gap-2"
                 onClick={() => navigate(`/products?category=${item.value}`)}
               >
-                <div className="h-[10rem] w-[10rem] min-h-[10rem] min-w-[10rem] bg-gray-300 rounded-full" />
+                <div className="h-[10rem] w-[10rem] min-h-[10rem] min-w-[10rem] bg-gray-300 rounded-full">
+                  <img
+                    className="rounded-full"
+                    src={item.imageUrl}
+                    alt={item.label}
+                  />
+                </div>
                 <p className="font-bold text-2xl text-primary-color">
                   {item.label}
                 </p>
               </div>
             );
           })}
-          {/* <div className="flex flex-col items-center gap-2">
-            <div className="h-[10rem] w-[10rem] min-h-[10rem] min-w-[10rem] bg-gray-300 rounded-full" />
-            <p className="font-bold text-2xl text-primary-color">Skin Care</p>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="h-[10rem] w-[10rem] min-h-[10rem] min-w-[10rem] bg-gray-300 rounded-full" />
-            <p className="font-bold text-2xl text-primary-color">Body Care</p>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="h-[10rem] w-[10rem] min-h-[10rem] min-w-[10rem] bg-gray-300 rounded-full" />
-            <p className="font-bold text-2xl text-primary-color">Hair Care</p>
-          </div> */}
         </div>
       </div>
     </div>

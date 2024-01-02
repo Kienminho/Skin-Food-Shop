@@ -10,24 +10,20 @@ import { useCategories } from "../hooks/use-categories";
 
 const priceOptions = [
   {
-    label: "Dưới 500.000₫ ",
-    value: "minPrice=5000000",
+    label: "Dưới 100.000₫ ",
+    value: "maxPrice=100000",
   },
   {
-    label: "500.000₫ - 1.000.000₫ ",
-    value: "minPrice=500000&maxPrice=1000000",
+    label: "100.000₫ - 250.000₫ ",
+    value: "minPrice=100000&maxPrice=250000",
   },
   {
-    label: "1.000.000₫ - 1.500.000₫ ",
-    value: "minPrice=1000000&maxPrice=1500000",
+    label: "250.000₫ - 500.000₫ ",
+    value: "minPrice=250000&maxPrice=500000",
   },
   {
-    label: "1.500.000₫ - 2.000.000₫ ",
-    value: "minPrice=1500000&maxPrice=2000000",
-  },
-  {
-    label: "Trên 2.000.000₫",
-    value: "minPrice=2000000",
+    label: "Trên 500.000₫",
+    value: "minPrice=500000",
   },
 ];
 
@@ -80,7 +76,7 @@ const ItemByCategory = () => {
             <h3 className="text-xl mb-4 mt-4 font-bold">GIÁ SẢN PHẨM </h3>
             <Radio.Group
               onChange={onPriceChange}
-              value={searchParams.get("price") ?? "minPrice=5000000"}
+              value={searchParams.get("price") ?? "maxPrice=100000"}
             >
               <Space direction="vertical">
                 {priceOptions.map((item) => {

@@ -66,31 +66,40 @@ const Footer = () => {
           </div>
           <div className="flex flex-col gap-3 ">
             <h3 className="text-white text-base font-bold mb-2">VỀ ORIYOUNG</h3>
-            <a href="#" className="text-white text-base">
+            <Link to="/blogs" className="text-white text-base">
               Chuyện nhà Ori
-            </a>
+            </Link>
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="text-white text-base font-bold mb-2">CHÍNH SÁCH</h3>
             <Link to="/policy" className="text-white text-base">
               Chính sách đổi trả
             </Link>
-            <a href="#" className="text-white text-base">
+            <Link to="/delivery" className="text-white text-base">
               Chính sách giao hàng
-            </a>
-            <a href="#" className="text-white text-base">
+            </Link>
+            <Link to="/private-policy" className="text-white text-base">
               Chính sách bảo mật
-            </a>
+            </Link>
           </div>
           <div className="flex flex-col gap-3">
             <h3 className="text-white text-base font-bold mb-2">
               CHĂM SÓC KHÁCH HÀNG
             </h3>
-            <a href="#" className="text-white text-base">
+            <Link to="/faq" className="text-white text-base">
               Hỏi đáp - FAQs
+            </Link>
+            <a href="#" className="text-white text-base">
+              Liên hệ:
             </a>
             <a href="#" className="text-white text-base">
-              Liên hệ
+              Địa chỉ: 669 QL1A, khu phố 3, Thủ Đức, Thành phố Hồ Chí Minh
+            </a>
+            <a href="#" className="text-white text-base">
+              Số điện thoại: 9999999999
+            </a>
+            <a href="#" className="text-white text-base">
+              Email: contact@ori.com
             </a>
           </div>
         </div>

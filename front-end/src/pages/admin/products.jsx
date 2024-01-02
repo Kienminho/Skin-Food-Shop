@@ -1,4 +1,4 @@
-import { Select, Button, Table, Popconfirm, message } from "antd";
+import { Select, Button, Table, Popconfirm, message, Avatar } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useProducts } from "../../hooks/use-products";
 import { useNavigate } from "react-router-dom";
@@ -33,6 +33,14 @@ const Products = () => {
       title: "Tên sản phẩm",
       dataIndex: "name",
       key: "name",
+      render: (text, record) => (
+        <div className="flex items-center gap-4">
+          <div className="border border-primary-color rounded-full">
+            <Avatar size="large" src={record.image} />
+          </div>
+          <span>{text}</span>
+        </div>
+      ),
     },
     {
       title: "SKU",
@@ -90,10 +98,8 @@ const Products = () => {
     return (data?.data ?? []).sort((a, b) => a.price - b.price);
   }, [sortOrder, data]);
 
-  console.log("products", products);
-
   return (
-    <div className="mt-4">
+    <div className="mt-4 h-[calc(100vh-75px)] overflow-auto">
       {contextHolder}
       <div className="flex items-center justify-between mb-6">
         <Select

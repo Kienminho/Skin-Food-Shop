@@ -13,4 +13,5 @@ export const cartApi = {
   deleteProductFromCart(id) {
     return axiosClient.delete(`/cart/delete-product-in-cart/${id}`);
   },
+  deleteAll() {},
 };

@@ -1,10 +1,11 @@
 import { HeartIcon, ShoppingCartIcon } from "lucide-react";
-import { Avatar, Button, Dropdown, AutoComplete } from "antd";
+import { Avatar, Button, Dropdown, AutoComplete, message, Badge } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { productsApi } from "../api/products";
 import { debounce } from "lodash";
 import { useProfile } from "../hooks/user/use-profile";
+import { useCarts } from "../hooks/cart/use-carts";
 
 const isAuthentication = () => {
   const user = localStorage.getItem("skinFoodShopUser");
@@ -28,7 +29,15 @@ const items = [
 
 const user = JSON.parse(localStorage.getItem("skinFoodShopUser"));
 
+// eslint-disable-next-line react/prop-types
+const CartWrapper = ({ children }) => {
+  const { data: carts } = useCarts();
+  if (!carts?.data || !isAuthentication()) return children;
+  return <Badge count={carts?.data?.length}>{children}</Badge>;
+};
+
 const Header = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [completedOptions, setCompletedOptions] = useState([]);
@@ -69,6 +78,14 @@ const Header = () => {
     navigate(`/products/${value}`);
   };
 
+  const onCartClick = () => {
+    if (!isAuthentication()) {
+      messageApi.warning("Bạn phải đăng nhập để mua hàng");
+      return;
+    }
+    navigate("/cart");
+  };
+
   useEffect(() => {
     if (!search) return;
     const delayed = debounce(searchHandler, 500);
@@ -77,6 +94,7 @@ const Header = () => {
 
   return (
     <div className="container mx-auto flex items-center h-[84px] justify-between px-4 sm:px-6 lg:px-8 border-b border-primary-color">
+      {contextHolder}
       <Link to="/">
         <img className="h-[80px]" src="/images/logo.png" alt="Logo" />
       </Link>
@@ -92,25 +110,15 @@ const Header = () => {
           options={completedOptions}
           onSelect={onSelect}
         />
-        {/* <div className="group relative">
-          
-          <SearchIcon
-            size={20}
-            className="absolute left-3 top-1/2 -mt-2.5 text-primary-color pointer-events-none group-focus-within:text-primary-color"
-          />
-          <input
-            className="focus:ring-2 focus:ring-primary-color focus:outline-none appearance-none w-full text-sm leading-6 text-slate-900 placeholder-slate-400 rounded-xl py-2 pl-10 ring-1 ring-primary-color shadow-sm"
-            type="text"
-            aria-label="search"
-            placeholder="Search..."
-          />
-        </div> */}
+
         <div className="cursor-pointer h-[48px] w-[48px] min-h-[48px] min-w-[48px] rounded-full bg-primary-color flex items-center justify-center">
           <HeartIcon stroke="white" />
         </div>
-        <div className="cursor-pointer h-[48px] w-[48px] min-h-[48px] min-w-[48px] rounded-full bg-primary-color flex items-center justify-center">
-          <ShoppingCartIcon stroke="white" onClick={() => navigate("/cart")} />
-        </div>
+        <CartWrapper>
+          <div className="cursor-pointer h-[48px] w-[48px] min-h-[48px] min-w-[48px] rounded-full bg-primary-color flex items-center justify-center">
+            <ShoppingCartIcon stroke="white" onClick={onCartClick} />
+          </div>
+        </CartWrapper>
         <div>
           {isAuthentication() ? (
             <div className="  flex items-center gap-2">
