@@ -17,6 +17,10 @@ const items = [
     label: "Tài khoản",
   },
   {
+    key: "management",
+    label: "Quản lý",
+  },
+  {
     key: "logout",
     label: "Sign out",
   },
@@ -38,6 +42,9 @@ const Header = () => {
     }
     if (key === "account") {
       navigate("/profile");
+    }
+    if (key === "management") {
+      navigate("/admin/products");
     }
   };
   const searchHandler = async (key) => {
