@@ -6,7 +6,7 @@ const Auth = require("../common/auth");
 router.post(
   "/create-payment-intent",
   Auth.authenticateToken,
-  paymentController.createPaymentIntent
+  paymentController.deleteCartOfUser
 );
 
 module.exports = router;

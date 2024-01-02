@@ -53,6 +53,11 @@ const createPaymentIntent = async (req, res) => {
   }
 };
 
+const deleteCartOfUser = async (req, res) => {
+  await Cart.deleteMany({ userId: req.user.id });
+};
+
 module.exports = {
   createPaymentIntent: createPaymentIntent,
+  deleteCartOfUser: deleteCartOfUser,
 };
