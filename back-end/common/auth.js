@@ -28,13 +28,13 @@ const authenticateToken = (req, res, next) => {
   if (token == null)
     return res
       .status(401)
-      .json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
+      .json(Utils.createResponseModel(401, "Bạn cần phải đăng nhập."));
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err)
       return res
         .status(401)
-        .json(Utils.createResponseModel(401, "Bạn cần đăng nhập."));
+        .json(Utils.createResponseModel(401, "Bạn cần phải đăng nhập."));
     req.user = user;
     next();
   });

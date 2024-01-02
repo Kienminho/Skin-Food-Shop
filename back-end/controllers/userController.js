@@ -28,7 +28,12 @@ const refreshToken = async (req, res) => {
 
 const handleLogin = async (req, res) => {
   const { phone, password } = req.body;
-  const user = await User.findOne({ phone: phone, isDeleted: false });
+  //find user by phone or email
+
+  const user = await User.findOne({
+    $or: [{ phone: phone }, { email: phone }],
+    isDeleted: false,
+  });
   //check user exist
   if (!user) {
     return res
@@ -36,7 +41,7 @@ const handleLogin = async (req, res) => {
       .json(
         Utils.createResponseModel(
           400,
-          `Người dùng không tồn tại tài khoản với số điện thoại ${phone}.`
+          `Người dùng không tồn tại tài khoản với tài khoản ${phone}.`
         )
       );
   }
