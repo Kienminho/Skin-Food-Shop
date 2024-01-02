@@ -55,6 +55,7 @@ const createPaymentIntent = async (req, res) => {
 
 const deleteCartOfUser = async (req, res) => {
   await Cart.deleteMany({ userId: req.user.id });
+  return res.json(Utils.createSuccessResponseModel());
 };
 
 module.exports = {
