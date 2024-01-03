@@ -9,7 +9,7 @@ export const useProductsByCategory = ({
 } = {}) => {
   const [searchParams] = useSearchParams();
   const categoryName = searchParams.get("category") ?? "SkinCare";
-  const price = searchParams.get("price") ?? "minPrice=5000000";
+  const price = searchParams.get("price") ?? "maxPrice=5000000";
   return useQuery({
     queryKey: [
       "products",
