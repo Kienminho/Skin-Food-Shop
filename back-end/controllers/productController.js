@@ -352,8 +352,14 @@ const getProductByCategory = async (req, res) => {
     }
 
     let products;
-    if (typeof minPrice === "undefined" || typeof maxPrice === "undefined") {
-      products = category.products;
+    if (minPrice === undefined) {
+      products = category.products.filter(
+        (product) => product.price <= maxPrice
+      );
+    } else if (maxPrice === undefined) {
+      products = category.products.filter(
+        (product) => product.price >= minPrice
+      );
     } else {
       products = category.products.filter(
         (product) => product.price >= minPrice && product.price <= maxPrice
