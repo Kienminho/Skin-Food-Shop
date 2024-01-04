@@ -2,11 +2,13 @@
 import { HeartIcon, ShoppingCartIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { formatPriceVND } from "../../pages/product-detail";
 import { useAddProductCart } from "../../hooks/cart/use-add-product-cart";
 
 const CardItem = ({ item } = {}) => {
+  const queryClient = useQueryClient();
   const [messageApi, context] = message.useMessage();
   const navigate = useNavigate();
 
@@ -21,6 +23,7 @@ const CardItem = ({ item } = {}) => {
       },
       {
         onSuccess() {
+          queryClient.invalidateQueries({ queryKey: ["carts"] });
           messageApi.success("Thêm sản phẩm vào giỏ hàng thành công");
         },
         onError() {

@@ -33,8 +33,12 @@ const Footer = () => {
         </div>
         <div className="grid grid-cols-4 gap-6 pb-12 border-b border-white">
           <div className="flex flex-col gap-6">
-            <div className="relative">
-              <img className="w-full" src="/images/logo-white.png" alt="Logo" />
+            <div className="relative -top-[10px]">
+              <img
+                className="w-[230px] h-[90px]"
+                src="/images/logo-white.png"
+                alt="Logo"
+              />
               <div className="absolute bottom-0 left-0 text-white font-semibold">
                 Kết nối với Ori
               </div>
@@ -66,7 +70,7 @@ const Footer = () => {
           </div>
           <div className="flex flex-col gap-3 ">
             <h3 className="text-white text-base font-bold mb-2">VỀ ORIYOUNG</h3>
-            <Link to="/blogs" className="text-white text-base">
+            <Link to="/about-ori" className="text-white text-base">
               Chuyện nhà Ori
             </Link>
           </div>
@@ -89,10 +93,10 @@ const Footer = () => {
             <Link to="/faq" className="text-white text-base">
               Hỏi đáp - FAQs
             </Link>
-            <a href="#" className="text-white text-base">
-              Liên hệ:
-            </a>
-            <a href="#" className="text-white text-base">
+            <Link to="/contact" className="text-white text-base">
+              Liên hệ
+            </Link>
+            {/* <a href="#" className="text-white text-base">
               Địa chỉ: 669 QL1A, khu phố 3, Thủ Đức, Thành phố Hồ Chí Minh
             </a>
             <a href="#" className="text-white text-base">
@@ -100,7 +104,7 @@ const Footer = () => {
             </a>
             <a href="#" className="text-white text-base">
               Email: contact@ori.com
-            </a>
+            </a> */}
           </div>
         </div>
         <div className="text-base font-semibold text-white mt-12 text-center mb-12">

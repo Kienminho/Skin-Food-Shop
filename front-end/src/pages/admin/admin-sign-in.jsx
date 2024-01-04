@@ -63,7 +63,7 @@ const AdminSignIn = () => {
               onValuesChange={onValuesChange}
             >
               <Form.Item
-                label="Phone"
+                label="Phone & Email"
                 name="phone"
                 rules={[
                   {

@@ -37,7 +37,7 @@ const AdminSignUp = () => {
               onFinish={onFinish}
             >
               <Form.Item
-                label="Số diện thoại"
+                label="Phone & Email"
                 name="phone"
                 rules={[
                   {

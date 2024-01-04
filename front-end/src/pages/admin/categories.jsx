@@ -128,7 +128,7 @@ const Categories = () => {
           Thêm
         </Button>
       </div>
-      <Table dataSource={data?.data ?? []} columns={columns} rowKey="id" />;
+      <Table dataSource={data?.data ?? []} columns={columns} rowKey="id" />
       <CategoryModal
         selectedItem={selectedItem}
         isModalOpen={isModalOpen}

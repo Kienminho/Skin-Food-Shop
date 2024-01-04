@@ -18,15 +18,15 @@ const columns = [
     dataIndex: "email",
     key: "address",
   },
+  // {
+  //   title: "Số đơn hàng",
+  //   dataIndex: "totalOrders",
+  //   key: "totalOrders",
+  // },
   {
-    title: "Số đơn hàng",
-    dataIndex: "totalOrders",
-    key: "totalOrders",
-  },
-  {
-    title: "Trạng thái",
-    dataIndex: "address",
-    key: "address",
+    title: "Giới tính",
+    dataIndex: "gender",
+    key: "gender",
   },
 
   {
@@ -47,8 +47,6 @@ const columns = [
 
 const Users = () => {
   const { data, isLoading } = useUsers();
-
-  console.log(data?.data);
 
   if (isLoading) return <div>Loading...</div>;
 
