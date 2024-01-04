@@ -15,6 +15,8 @@ function getLocalRefreshToken() {
   return refreshToken;
 }
 
+const BASE_URL = import.meta.env.VITE_APP_API_URL;
+
 function setAccessToken(newAccessToken) {
   const user = JSON.parse(localStorage.getItem("skinFoodShopUser"));
   user.accessToken = newAccessToken;
@@ -22,7 +24,7 @@ function setAccessToken(newAccessToken) {
 }
 
 const axiosClient = axios.create({
-  baseURL: "https://skin-food-store.onrender.com/api",
+  baseURL: `${BASE_URL}/api`,
   timeout: 20000,
 });
 
