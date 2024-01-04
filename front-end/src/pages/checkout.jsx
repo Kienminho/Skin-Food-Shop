@@ -16,7 +16,7 @@ import { useCarts } from "../hooks/cart/use-carts";
 import { formatPriceVND } from "./product-detail";
 import { useProfile } from "../hooks/user/use-profile";
 import { useCheckout } from "../hooks/payment/use-checkout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -97,7 +97,8 @@ const Checkout = () => {
               </Radio.Group>
               <div className="my-6">
                 Nếu bạn không hài lòng với sản phẩm của chúng tôi? Bạn hoàn toàn
-                có thể trả lại sản phẩm. TÌm hiểu thêm Tại đây
+                có thể trả lại sản phẩm. Tìm hiểu thêm{" "}
+                <Link to="/policy">Tại đây</Link>
               </div>
               <Button
                 size="large"
@@ -111,7 +112,7 @@ const Checkout = () => {
             <div className="min-w-[400px]">
               <h1 className="font-bold text-3xl mb-6">Giỏ hàng</h1>
               <div className="flex flex-col gap-4 mb-6 max-h-[422px] overflow-auto">
-                {data?.data.map((item) => {
+                {(data?.data ?? [])?.map((item) => {
                   return (
                     <div key={item} className="flex items-center gap-4">
                       <img

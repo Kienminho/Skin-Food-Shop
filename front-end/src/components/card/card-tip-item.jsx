@@ -1,27 +1,19 @@
 import { Link } from "react-router-dom";
 
-const CardTipItem = () => {
+// eslint-disable-next-line react/prop-types
+const CardTipItem = ({ title, description, image }) => {
   return (
     <Link to="/tips" className="flex flex-col gap-4">
-      <div className=" overflow-hidden  shadow-md rounded-xl ">
+      <div className=" overflow-hidden shadow-md rounded-xl ">
         <div className="relative">
           <a href="#">
-            <img
-              className="w-full"
-              alt="Sunset in the mountains"
-              src="/images/tips-img-1.png"
-            />
+            <img className="w-full" alt="Sunset in the mountains" src={image} />
             <div className="hover:bg-transparent transition duration-300 absolute bottom-0 top-0 right-0 left-0  opacity-25"></div>
           </a>
         </div>
         <div className="px-4 py-3 flex flex-col gap-2">
-          <h3 className="text-xl font-semibold text-[#222529]">
-            Thoa kem chống nắng đúng cách
-          </h3>
-          <p className="text-base text-[#222529]">
-            Một đoạn ngắn giới thiệu (trích từ bài viết) sẽ dài khoảng 3 dòng 3
-            dòng dd3 dòng 3 dòng như thế này
-          </p>
+          <h3 className="text-xl font-semibold text-[#222529]">{title}</h3>
+          <p className="text-base text-[#222529]">{description}</p>
           <Link to="/tips" className="text-base text-primary-color">
             Xem thêm...
           </Link>

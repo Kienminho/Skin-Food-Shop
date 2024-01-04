@@ -27,6 +27,7 @@ import Delivery from "./pages/delivery";
 import PrivatePolicy from "./pages/private-policy";
 import Faq from "./pages/faq";
 import CheckoutSuccess from "./pages/checkout-success";
+import Contact from "./pages/contact";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -73,7 +74,7 @@ const router = createBrowserRouter([
     element: <Faq />,
   },
   {
-    path: "/blogs",
+    path: "/about-ori",
     element: <Blogs />,
   },
   {
@@ -99,6 +100,10 @@ const router = createBrowserRouter([
   {
     path: "/policy",
     element: <Policy />,
+  },
+  {
+    path: "/contact",
+    element: <Contact />,
   },
   {
     path: "/admin",

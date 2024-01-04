@@ -6,6 +6,7 @@ import { useUpdateProduct } from "../../hooks/use-update-product";
 import { useQueryClient } from "@tanstack/react-query";
 import MarkdownEditor from "../../components/markdown-editor";
 import { useCategories } from "../../hooks/use-categories";
+import UploadImage from "../../components/upload-image";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -19,33 +20,48 @@ const EditProduct = () => {
 
   const { mutate } = useUpdateProduct();
 
-  const onSubmit = (values) => {
-    mutate(
-      {
-        ...{
-          capacity: data.data.capacity,
-          description: data.data.description,
-          name: data.data.name,
-          price: data.data.price,
-          productCode: data.data.productCode,
-          quantity: data.data.quantity,
-          categoryName: data.data.categoryName,
-          image: data.data.image,
-          productId: data.data._id,
-        },
-        ...values,
+  const onSubmit = async (values) => {
+    const updateFields = {
+      ...{
+        capacity: data.data.capacity,
+        description: data.data.description,
+        name: data.data.name,
+        price: data.data.price,
+        productCode: data.data.productCode,
+        quantity: data.data.quantity,
+        categoryName: data.data.categoryName,
+        image: data.data.image,
+        productId: data.data._id,
       },
-      {
-        onSuccess() {
-          messageApi.success("Cập nhật thành công");
-          queryClient.invalidateQueries({ queryKey: ["products"] });
-          navigate(-1);
-        },
-        onError() {
-          messageApi.error("Cập nhật thất bại");
-        },
-      }
-    );
+      ...values,
+    };
+
+    if (values.image?.length > 0) {
+      const formData = new FormData();
+      values.image.forEach((file) => {
+        formData.append("image", file);
+      });
+      const res = await fetch(
+        "https://skin-food-store.onrender.com/api/product/upload-image",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const response = await res.json();
+      updateFields.image = response.data;
+    }
+
+    mutate(updateFields, {
+      onSuccess() {
+        messageApi.success("Cập nhật thành công");
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+        navigate(-1);
+      },
+      onError() {
+        messageApi.error("Cập nhật thất bại");
+      },
+    });
   };
 
   if (isLoading || isCategoriesLoading) return <div>Loading...</div>;
@@ -114,8 +130,17 @@ const EditProduct = () => {
               </Col>
             </Row>
           </div>
-          {/* <div className="min-w-[30%] border border-primary-color rounded p-4">
-            <p>Trạng thái sản phẩm</p>
+          <div className="min-w-[30%] border border-primary-color rounded p-4">
+            <Form.Item
+              name="image"
+              rules={[
+                { required: true, message: "Không được để trống trường này!" },
+              ]}
+            >
+              <UploadImage />
+            </Form.Item>
+
+            {/* <p>Trạng thái sản phẩm</p>
             <Divider />
             <Form.Item label="Trạng thái" name="status">
               <Radio.Group>
@@ -129,8 +154,8 @@ const EditProduct = () => {
                 <Radio value={1}>Hiển thị</Radio>
                 <Radio value={2}>Không hiển thị</Radio>
               </Radio.Group>
-            </Form.Item>
-          </div> */}
+            </Form.Item> */}
+          </div>
         </div>
         <div className="flex justify-end gap-4">
           <Button>Huỷ</Button>

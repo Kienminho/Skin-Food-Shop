@@ -197,21 +197,6 @@ const CreateProduct = () => {
             >
               <UploadImage />
             </Form.Item>
-            {/* <p>Trạng thái sản phẩm</p>
-            <Divider />
-            <Form.Item label="Trạng thái" name="status">
-              <Radio.Group>
-                <Radio value={1}>Cho phép</Radio>
-                <Radio value={2}>Không cho phép</Radio>
-              </Radio.Group>
-            </Form.Item>
-            <Divider />
-            <Form.Item label="Hiển thị" name="isShow">
-              <Radio.Group>
-                <Radio value={1}>Hiển thị</Radio>
-                <Radio value={2}>Không hiển thị</Radio>
-              </Radio.Group>
-            </Form.Item> */}
           </div>
         </div>
         <div className="flex justify-end gap-4">

@@ -10,4 +10,7 @@ export const userApi = {
   updateMe(body) {
     return axiosClient.put(`/user/update-info`, body);
   },
+  delete(id) {
+    return axiosClient.delete(`/user/delete-user/${id}`);
+  },
 };

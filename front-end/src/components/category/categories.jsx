@@ -4,12 +4,12 @@ const options = [
   {
     label: "Skin Care",
     value: "SkinCare",
-    imageUrl: "/images/skincare.jpg",
+    imageUrl: " /images/bodycare.jpg",
   },
   {
     label: "Body Care",
     value: "SkinCare",
-    imageUrl: "/images/bodycare.jpg",
+    imageUrl: "/images/skincare.jpg",
   },
   {
     label: "Hair Care",

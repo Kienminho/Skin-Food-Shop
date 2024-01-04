@@ -20,7 +20,7 @@ const SignIn = () => {
   const onFinish = (values) => {
     mutate(values, {
       onSuccess(response) {
-        console.log(response)
+        console.log(response);
         localStorage.setItem("skinFoodShopUser", JSON.stringify(response.data));
         messageApi.open({
           type: "success",
@@ -90,7 +90,7 @@ const SignIn = () => {
                 initialValues={getInitialValues()}
               >
                 <Form.Item
-                  label="Phone"
+                  label="Phone & Email"
                   name="phone"
                   rules={[
                     {
@@ -149,7 +149,7 @@ const SignIn = () => {
                 form={signUpForm}
               >
                 <Form.Item
-                  label="Phone"
+                  label="Phone & Email"
                   name="phone"
                   rules={[
                     {
