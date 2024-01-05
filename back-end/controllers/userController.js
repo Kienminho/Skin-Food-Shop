@@ -179,7 +179,7 @@ const changePassword = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   try {
-    const { oldPassword, newPassword, account } = req.body;
+    const { newPassword, account } = req.body;
     if (account === undefined) {
       return res
         .status(400)
@@ -203,15 +203,6 @@ const forgotPassword = async (req, res) => {
         );
     }
 
-    if (oldPassword === newPassword) {
-      return res
-        .status(400)
-        .json(
-          Utils.createErrorResponseModel(
-            `Mật khẩu mới không được trùng với mật khẩu cũ.`
-          )
-        );
-    }
     const isPasswordCorrect = await Utils.validatePassword(
       oldPassword,
       user.password
