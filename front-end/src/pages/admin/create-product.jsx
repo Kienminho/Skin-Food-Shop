@@ -14,54 +14,70 @@ const CreateProduct = () => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState(false);
+  const [description, setDescription] = useState("");
 
   const { mutate } = useAddProduct();
 
   const { data, isLoading: isCategoriesLoading } = useCategories();
 
   const onSubmit = async (values) => {
-    setIsLoading(true);
-    const formData = new FormData();
-    values.image.forEach((file) => {
-      formData.append("image", file);
-    });
-    fetch("https://skin-food-store.onrender.com/api/product/upload-image", {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        mutate(
+    try {
+      const updatedValues = {
+        categoryName: values.categoryName,
+        product: {
+          name: values.name,
+          price: parseFloat(values.price),
+          capacity: values.capacity,
+          productCode: values.productCode,
+          quantity: parseInt(values.quantity),
+          description,
+        },
+      };
+      setIsLoading(true);
+      if (values.image.length > 0) {
+        const formData = new FormData();
+        values.image.forEach((file) => {
+          formData.append("image", file);
+        });
+        const res = await fetch(
+          "https://skin-food-store.onrender.com/api/product/upload-image",
           {
-            categoryName: values.categoryName,
-            product: {
-              name: values.name,
-              price: parseFloat(values.price),
-              capacity: values.capacity,
-              productCode: values.productCode,
-              quantity: parseInt(values.quantity),
-              description: values.description,
-              image: response.data,
-            },
-          },
-          {
-            onSuccess() {
-              messageApi.success("Thêm mới thành công");
-              queryClient.invalidateQueries({ queryKey: ["products"] });
-              navigate("/admin/products");
-            },
-            onError() {
-              messageApi.error("Thêm mới thất bại");
-            },
-            onSettled() {
-              setIsLoading(false);
-            },
+            method: "POST",
+            body: formData,
           }
         );
-      })
-      .catch(() => {
-        message.error("upload failed.");
+        const response = await res.json();
+        updatedValues.product["image"] = response.data;
+      }
+      const formData = new FormData();
+      values.image.forEach((file) => {
+        formData.append("image", file);
       });
+      mutate(updatedValues, {
+        onSuccess() {
+          messageApi.success("Thêm mới thành công");
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+          navigate("/admin/products");
+        },
+        onError() {
+          messageApi.error("Thêm mới thất bại");
+        },
+        onSettled() {
+          setIsLoading(false);
+        },
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const onValuesChange = (updateFields) => {
+    if (
+      updateFields?.description &&
+      typeof updateFields?.description === "string"
+    ) {
+      setDescription(updateFields.description);
+    }
   };
 
   if (isCategoriesLoading) return <div>Loading...</div>;
@@ -78,7 +94,13 @@ const CreateProduct = () => {
         />
         <span className="font-bold text-2xl">Thêm sản phẩm mới</span>
       </div>
-      <Form form={form} layout="vertical" size="large" onFinish={onSubmit}>
+      <Form
+        form={form}
+        layout="vertical"
+        size="large"
+        onFinish={onSubmit}
+        onValuesChange={onValuesChange}
+      >
         <div className="flex gap-6 mb-10">
           <div className="border border-primary-color rounded p-4">
             <Row gutter={[28, 0]}>
@@ -200,7 +222,7 @@ const CreateProduct = () => {
           </div>
         </div>
         <div className="flex justify-end gap-4">
-          <Button>Huỷ</Button>
+          <Button onClick={() => navigate("/admin/products")}>Huỷ</Button>
           <Button htmlType="submit" type="primary">
             Lưu
           </Button>

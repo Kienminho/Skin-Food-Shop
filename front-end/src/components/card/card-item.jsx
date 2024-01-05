@@ -46,7 +46,7 @@ const CardItem = ({ item } = {}) => {
             src={item?.image}
             alt="Sunset in the mountains"
           />
-          <div className="hover:bg-transparent transition duration-300 absolute bottom-0 top-0 right-0 left-0 bg-gray-900 opacity-25"></div>
+          <div className="hover:bg-transparent transition duration-300 absolute bottom-0 top-0 right-0 left-0 "></div>
         </a>
       </div>
       <div className="px-4 py-3 flex flex-col gap-2">

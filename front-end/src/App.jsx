@@ -28,6 +28,7 @@ import PrivatePolicy from "./pages/private-policy";
 import Faq from "./pages/faq";
 import CheckoutSuccess from "./pages/checkout-success";
 import Contact from "./pages/contact";
+import ForgotPassword from "./pages/forgot-password";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -104,6 +105,10 @@ const router = createBrowserRouter([
   {
     path: "/contact",
     element: <Contact />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
   },
   {
     path: "/admin",

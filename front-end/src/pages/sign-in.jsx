@@ -119,7 +119,7 @@ const SignIn = () => {
                   <Form.Item noStyle name="remember" valuePropName="checked">
                     <Checkbox>Ghi nhớ</Checkbox>
                   </Form.Item>
-                  <Link>Quên mật khẩu?</Link>
+                  <Link to="/forgot-password">Quên mật khẩu?</Link>
                 </div>
 
                 <Form.Item>

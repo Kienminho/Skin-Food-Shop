@@ -90,7 +90,7 @@ const Blogs = () => {
             </div>
           </div>
         </div>
-        <div>
+        {/* <div>
           <h2 className="text-t-red text-4xl font-bold mb-10 text-center">
             Đội ngũ Ori
           </h2>
@@ -100,7 +100,7 @@ const Blogs = () => {
             <div className="w-[200px] h-[200px] rounded bg-primary-color"></div>
             <div className="w-[200px] h-[200px] rounded bg-primary-color"></div>
           </div>
-        </div>
+        </div> */}
       </div>
       <Footer />
     </div>
