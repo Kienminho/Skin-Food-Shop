@@ -1,18 +1,20 @@
 import Header from "../components/header";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
-
+import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, message } from "antd";
 import { useForgotPassword } from "../hooks/user/use-forgot-password";
 
 const ForgotPassword = () => {
+  const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const { mutate } = useForgotPassword();
 
   const onForgotPassword = async (values) => {
     mutate(values, {
       onSuccess() {
-        messageApi.success("Đã gửi yêu cầu thay đổi mật khẩu!");
+        navigate("/sign-in");
+        messageApi.success("Thành công!");
       },
       onError() {
         messageApi.error("Thất bại!");

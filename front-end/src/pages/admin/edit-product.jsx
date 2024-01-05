@@ -37,7 +37,7 @@ const EditProduct = () => {
           productId: data.data._id,
         },
         ...values,
-        description,
+        description: description || data.data.description,
       };
 
       if (values?.image?.length > 0 && !(typeof values.image === "string")) {
