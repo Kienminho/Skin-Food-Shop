@@ -7,6 +7,8 @@ import UpdateProfileModal from "../components/profile/update-profile-modal";
 import { useState } from "react";
 import { useUpdateProfile } from "../hooks/user/use-update-profile";
 import { useQueryClient } from "@tanstack/react-query";
+import UpdatePasswordModal from "../components/profile/update-password-modal";
+import { useUpdatePassword } from "../hooks/user/use-update-password";
 
 function formatDate(dateString) {
   if (!dateString) return "";
@@ -28,9 +30,11 @@ const Profile = () => {
   const queryClient = useQueryClient();
   const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
 
   const { data, isLoading } = useProfile();
   const { mutate: update } = useUpdateProfile();
+  const { mutate: mutatePassword } = useUpdatePassword();
 
   const updateProfile = (values) => {
     update(values, {
@@ -44,6 +48,18 @@ const Profile = () => {
       },
       onSettled() {
         setIsModalOpen(false);
+      },
+    });
+  };
+
+  const updatePassword = (values) => {
+    mutatePassword(values, {
+      onSuccess() {
+        setIsPasswordOpen(false);
+        messageApi.success("Chỉnh sửa thành công");
+      },
+      onError(error) {
+        messageApi.error(error.response.data.message);
       },
     });
   };
@@ -73,7 +89,7 @@ const Profile = () => {
           <div className="flex items-center justify-between mb-4">
             <span className="text-base text-gray-400">Họ và tên</span>
             <span className="text-base font-bold">
-              {data?.data.name ?? "Vô danh"}
+              {data?.data?.name ?? "Người dùng"}
             </span>
           </div>
           <div className="flex items-center justify-between mb-4">
@@ -109,7 +125,7 @@ const Profile = () => {
             <span className="text-base font-bold">........</span>
           </div>
 
-          <Button>Cập nhật </Button>
+          <Button onClick={() => setIsPasswordOpen(true)}>Cập nhật </Button>
         </div>
       </div>
       <Footer />
@@ -118,6 +134,11 @@ const Profile = () => {
         setOpen={setIsModalOpen}
         onSubmit={updateProfile}
         profile={data.data}
+      />
+      <UpdatePasswordModal
+        open={isPasswordOpen}
+        setOpen={setIsPasswordOpen}
+        onSubmit={updatePassword}
       />
     </div>
   );

@@ -125,7 +125,7 @@ const Header = () => {
               <div className="flex flex-col items-end">
                 <div>Hi,</div>
                 <div className="font-bold text-secondary-t-black">
-                  {data?.data?.name ?? "Vô danh"}
+                  {data?.data?.name ?? "Người dùng"}
                 </div>
               </div>
               <Dropdown menu={{ items, onClick: logout }} trigger={["click"]}>

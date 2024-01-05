@@ -13,8 +13,8 @@ const CheckoutSuccess = () => {
       <div className="container mx-auto flex items-center justify-center">
         <Result
           status="success"
-          title="Successfully Purchased Cloud Server ECS!"
-          subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
+          title="Đặt hàng thành công"
+          subTitle="Cảm ơn bạn đã đặt hàng tại Oriyoung"
           extra={[
             <Button type="primary" key="buy" onClick={() => navigate("/")}>
               Home

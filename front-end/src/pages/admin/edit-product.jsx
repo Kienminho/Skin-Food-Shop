@@ -7,12 +7,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import MarkdownEditor from "../../components/markdown-editor";
 import { useCategories } from "../../hooks/use-categories";
 import UploadImage from "../../components/upload-image";
+import { useState } from "react";
 
 const EditProduct = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
   const [messageApi, contextHolder] = message.useMessage();
+  const [description, setDescription] = useState("");
 
   const { data, isLoading } = useProduct();
   const { data: { data: categories } = {}, isLoading: isCategoriesLoading } =
@@ -21,47 +23,60 @@ const EditProduct = () => {
   const { mutate } = useUpdateProduct();
 
   const onSubmit = async (values) => {
-    const updateFields = {
-      ...{
-        capacity: data.data.capacity,
-        description: data.data.description,
-        name: data.data.name,
-        price: data.data.price,
-        productCode: data.data.productCode,
-        quantity: data.data.quantity,
-        categoryName: data.data.categoryName,
-        image: data.data.image,
-        productId: data.data._id,
-      },
-      ...values,
-    };
+    try {
+      const updateFields = {
+        ...{
+          capacity: data.data.capacity,
+          description: data.data.description,
+          name: data.data.name,
+          price: data.data.price,
+          productCode: data.data.productCode,
+          quantity: data.data.quantity,
+          categoryName: data.data.categoryName,
+          image: data.data.image,
+          productId: data.data._id,
+        },
+        ...values,
+        description: description || data.data.description,
+      };
 
-    if (values.image?.length > 0) {
-      const formData = new FormData();
-      values.image.forEach((file) => {
-        formData.append("image", file);
+      if (values?.image?.length > 0 && !(typeof values.image === "string")) {
+        const formData = new FormData();
+        values.image.forEach((file) => {
+          formData.append("image", file);
+        });
+        const res = await fetch(
+          "https://skin-food-store.onrender.com/api/product/upload-image",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        const response = await res.json();
+        updateFields.image = response.data;
+      }
+
+      mutate(updateFields, {
+        onSuccess() {
+          messageApi.success("Cập nhật thành công");
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+          navigate(-1);
+        },
+        onError() {
+          messageApi.error("Cập nhật thất bại");
+        },
       });
-      const res = await fetch(
-        "https://skin-food-store.onrender.com/api/product/upload-image",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-      const response = await res.json();
-      updateFields.image = response.data;
+    } catch (error) {
+      console.log(error.message);
     }
-
-    mutate(updateFields, {
-      onSuccess() {
-        messageApi.success("Cập nhật thành công");
-        queryClient.invalidateQueries({ queryKey: ["products"] });
-        navigate(-1);
-      },
-      onError() {
-        messageApi.error("Cập nhật thất bại");
-      },
-    });
+  };
+  const onValuesChange = (updateFields) => {
+    if (
+      updateFields?.description &&
+      typeof updateFields?.description === "string"
+    ) {
+      setDescription(updateFields.description);
+    }
   };
 
   if (isLoading || isCategoriesLoading) return <div>Loading...</div>;
@@ -84,6 +99,7 @@ const EditProduct = () => {
         size="large"
         initialValues={data.data}
         onFinish={onSubmit}
+        onValuesChange={onValuesChange}
       >
         <div className="flex gap-6 mb-10">
           <div className="border border-primary-color rounded p-4">
@@ -158,7 +174,7 @@ const EditProduct = () => {
           </div>
         </div>
         <div className="flex justify-end gap-4">
-          <Button>Huỷ</Button>
+          <Button onClick={() => navigate("/admin/products")}>Huỷ</Button>
           <Button htmlType="submit" type="primary">
             Lưu
           </Button>
