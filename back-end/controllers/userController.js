@@ -203,20 +203,6 @@ const forgotPassword = async (req, res) => {
         );
     }
 
-    const isPasswordCorrect = await Utils.validatePassword(
-      oldPassword,
-      user.password
-    );
-    if (!isPasswordCorrect) {
-      return res
-        .status(400)
-        .json(
-          Utils.createResponseModel(
-            400,
-            `Mật khẩu cũ không đúng, vui lòng thử lại`
-          )
-        );
-    }
     const hashPassword = Utils.hashPassword(newPassword);
     user.password = hashPassword;
     user.updated_at = new Date();
