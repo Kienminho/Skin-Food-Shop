@@ -21,7 +21,7 @@ const ItemByCategory = () => {
         <h2 className="text-center text-5xl font-bold text-t-red mb-8">
           Skincare
         </h2>
-        <div className="flex items-center justify-center gap-12">
+        <div className="flex items-center justify-center gap-12 md:gap-4">
           {(skincareProducts?.data ?? []).map((item) => {
             return <CardItem key={item._id} item={item} />;
           })}
@@ -31,7 +31,7 @@ const ItemByCategory = () => {
         <h2 className="text-center text-5xl font-bold text-primary-color mb-8">
           Bodycare
         </h2>
-        <div className="flex items-center justify-center gap-12">
+        <div className="flex items-center justify-center gap-12 md:gap-4">
           {(bodycareProducts?.data ?? []).map((item) => {
             return <CardItem key={item._id} item={item} />;
           })}
@@ -41,7 +41,7 @@ const ItemByCategory = () => {
         <h2 className="text-center text-5xl font-bold text-t-red mb-8">
           Haircare
         </h2>
-        <div className="flex items-center justify-center gap-12">
+        <div className="flex items-center justify-center gap-12 md:gap-4">
           {(haircareProducts?.data ?? []).map((item) => {
             return <CardItem key={item._id} item={item} />;
           })}

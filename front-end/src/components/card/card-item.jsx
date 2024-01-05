@@ -35,19 +35,16 @@ const CardItem = ({ item } = {}) => {
 
   return (
     <div
-      className=" overflow-hidden cursor-pointer shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl max-w-[250px]"
+      className=" overflow-hidden cursor-pointer shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl md:max-w-[150px] lg:max-w-[250px]"
       onClick={() => navigate(`/products/${item?._id}`)}
     >
       {context}
       <div className="relative">
-        <a>
-          <img
-            className="w-full"
-            src={item?.image}
-            alt="Sunset in the mountains"
-          />
-          <div className="hover:bg-transparent transition duration-300 absolute bottom-0 top-0 right-0 left-0 "></div>
-        </a>
+        <img
+          className="w-full"
+          src={item?.image}
+          alt="Sunset in the mountains"
+        />
       </div>
       <div className="px-4 py-3 flex flex-col gap-2">
         <div className="flex items-center justify-between">

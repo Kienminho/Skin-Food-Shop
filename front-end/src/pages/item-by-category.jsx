@@ -40,10 +40,17 @@ const ItemByCategory = () => {
 
   const onCategoryChange = (e) => {
     searchParams.set("category", e.target.value);
+    searchParams.set("page", 1);
     setSearchParams(searchParams);
   };
   const onPriceChange = (e) => {
     searchParams.set("price", e.target.value);
+    searchParams.set("page", 1);
+    setSearchParams(searchParams);
+  };
+
+  const onPageChange = (values) => {
+    searchParams.set("page", values);
     setSearchParams(searchParams);
   };
 
@@ -56,13 +63,16 @@ const ItemByCategory = () => {
       <Hero />
       <div className="container mx-auto mt-10 mb-10">
         <div className="flex items-start gap-8">
-          <div className="bg-[#84BC4E0D] py-6 px-4 min-w-[300px]">
+          <div className="bg-[#84BC4E0D] py-6 px-4 min-w-[300px] md:min-w-[240px]">
             <h3 className="text-xl mb-4 font-bold">Danh mục sản phẩm</h3>
             <Radio.Group
               onChange={onCategoryChange}
-              value={searchParams.get("category") ?? "SkinCare"}
+              value={searchParams.get("category") ?? "all"}
             >
               <Space direction="vertical">
+                <Radio value="all">
+                  <span className="text-lg font-normal">Tất cả</span>
+                </Radio>
                 {options.map((item) => {
                   return (
                     <Radio key={item.value} value={item.value}>
@@ -76,7 +86,7 @@ const ItemByCategory = () => {
             <h3 className="text-xl mb-4 mt-4 font-bold">GIÁ SẢN PHẨM </h3>
             <Radio.Group
               onChange={onPriceChange}
-              value={searchParams.get("price") ?? "maxPrice=100000"}
+              value={searchParams.get("price")}
             >
               <Space direction="vertical">
                 {priceOptions.map((item) => {
@@ -96,10 +106,11 @@ const ItemByCategory = () => {
               {Boolean(data?.data?.length) && (
                 <Pagination
                   size="large"
-                  pageSize={10}
-                  defaultCurrent={1}
-                  total={data.totalItems}
+                  pageSize={12}
+                  defaultCurrent={searchParams.get("page") ?? 1}
+                  total={data.totalRecord}
                   showSizeChanger={false}
+                  onChange={onPageChange}
                 />
               )}
             </div>
