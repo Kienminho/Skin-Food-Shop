@@ -177,6 +177,66 @@ const changePassword = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword, account } = req.body;
+    if (account === undefined) {
+      return res
+        .status(400)
+        .json(
+          Utils.createErrorResponseModel(
+            `Vui lòng nhập email hoặc số điện thoại.`
+          )
+        );
+    }
+
+    const user = await User.findOne({
+      $or: [{ phone: account }, { email: account }],
+    });
+    if (!user) {
+      return res
+        .status(400)
+        .json(
+          Utils.createErrorResponseModel(
+            `Người dùng không tồn tại với tài khoản ${account}.`
+          )
+        );
+    }
+
+    if (oldPassword === newPassword) {
+      return res
+        .status(400)
+        .json(
+          Utils.createErrorResponseModel(
+            `Mật khẩu mới không được trùng với mật khẩu cũ.`
+          )
+        );
+    }
+    const isPasswordCorrect = await Utils.validatePassword(
+      oldPassword,
+      user.password
+    );
+    if (!isPasswordCorrect) {
+      return res
+        .status(400)
+        .json(
+          Utils.createResponseModel(
+            400,
+            `Mật khẩu cũ không đúng, vui lòng thử lại`
+          )
+        );
+    }
+    const hashPassword = Utils.hashPassword(newPassword);
+    user.password = hashPassword;
+    user.updated_at = new Date();
+    await user.save();
+    return res.json(Utils.createSuccessResponseModel(1, user._id));
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(Utils.createErrorResponseModel(err.message));
+  }
+};
+
 //get all user , role != admin, isDeleted = false
 const getAllUsers = async (req, res) => {
   try {
@@ -229,4 +289,5 @@ module.exports = {
   deleteUser: deleteUser,
   checkPermission: checkPermission,
   refreshToken: refreshToken,
+  forgotPassword: forgotPassword,
 };

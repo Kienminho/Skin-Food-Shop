@@ -24,9 +24,11 @@ router.get(
 );
 router.put(
   "/change-password",
-  Auth.authenticateRefreshToken,
+  Auth.authenticateToken,
   userController.changePassword
 );
+
+router.post("/forgot-password", userController.forgotPassword);
 
 //admin
 router.get(
