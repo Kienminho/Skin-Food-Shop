@@ -254,14 +254,24 @@ const updateProduct = async (req, res) => {
     } = req.body;
 
     const product = await Product.findById(productId);
+    if (image !== undefined || image !== null || image !== "") {
+      product.productCode = productCode;
+      product.name = name;
+      product.description = description;
+      product.image = image;
+      product.capacity = capacity;
+      product.price = price;
+      product.quantity = quantity;
+    } else {
+      product.productCode = productCode;
+      product.name = name;
+      product.description = description;
+      product.capacity = capacity;
+      product.price = price;
+      product.quantity = quantity;
+    }
     //update product
-    product.productCode = productCode;
-    product.name = name;
-    product.description = description;
-    product.image = image;
-    product.capacity = capacity;
-    product.price = price;
-    product.quantity = quantity;
+
     await product.save();
 
     //update quantity for each product in category
@@ -339,6 +349,9 @@ const deleteProduct = async (req, res) => {
 //get product by category
 const getProductByCategory = async (req, res) => {
   try {
+    let totalRecord = 0;
+    let products;
+
     const {
       categoryName,
       minPrice,
@@ -346,24 +359,32 @@ const getProductByCategory = async (req, res) => {
       pageSize = 9,
       pageIndex = 1,
     } = req.query;
-    const category = await Category.findOne({ name: categoryName });
-    if (!category || category === null) {
-      return res.json(Utils.createErrorResponseModel("Danh mục không tồn tại"));
-    }
-
-    let products;
-    if (minPrice === undefined) {
-      products = category.products.filter(
-        (product) => product.price <= maxPrice
-      );
-    } else if (maxPrice === undefined) {
-      products = category.products.filter(
-        (product) => product.price >= minPrice
-      );
+    if (categoryName === "all") {
+      products = await Product.find({
+        isDeleted: false,
+      });
+      totalRecord = products.length;
     } else {
-      products = category.products.filter(
-        (product) => product.price >= minPrice && product.price <= maxPrice
-      );
+      const category = await Category.findOne({ name: categoryName });
+      if (!category || category === null) {
+        return res.json(
+          Utils.createErrorResponseModel("Danh mục không tồn tại")
+        );
+      }
+      totalRecord = category.products.length;
+      if (minPrice === undefined) {
+        products = category.products.filter(
+          (product) => product.price <= maxPrice
+        );
+      } else if (maxPrice === undefined) {
+        products = category.products.filter(
+          (product) => product.price >= minPrice
+        );
+      } else {
+        products = category.products.filter(
+          (product) => product.price >= minPrice && product.price <= maxPrice
+        );
+      }
     }
 
     //pagination
@@ -371,9 +392,7 @@ const getProductByCategory = async (req, res) => {
       .filter((product) => product.isDeleted === false)
       .slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
-    return res.json(
-      Utils.createSuccessResponseModel(category.products.length, products)
-    );
+    return res.json(Utils.createSuccessResponseModel(totalRecord, products));
   } catch (err) {
     console.log(err);
     return res.status(500).json(Utils.createErrorResponseModel(err.message));
