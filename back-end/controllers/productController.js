@@ -363,6 +363,15 @@ const getProductByCategory = async (req, res) => {
       products = await Product.find({
         isDeleted: false,
       });
+      if (minPrice === undefined) {
+        products = products.filter((product) => product.price <= maxPrice);
+      } else if (maxPrice === undefined) {
+        products = products.filter((product) => product.price >= minPrice);
+      } else {
+        products = products.filter(
+          (product) => product.price >= minPrice && product.price <= maxPrice
+        );
+      }
       totalRecord = products.length;
     } else {
       const category = await Category.findOne({ name: categoryName });
