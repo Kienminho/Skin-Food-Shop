@@ -43,8 +43,9 @@ const Profile = () => {
         queryClient.invalidateQueries({ queryKey: ["profile"] });
         messageApi.success("Chỉnh sửa thông tin thành công");
       },
-      onError() {
-        messageApi.error("Chỉnh sửa thất bại");
+      onError(error) {
+        const message = error.response.data.message;
+        messageApi.error(message);
       },
       onSettled() {
         setIsModalOpen(false);
@@ -96,10 +97,10 @@ const Profile = () => {
             <span className="text-base text-gray-400">Số điện thoại </span>
             <span className="text-base font-bold">{data?.data.phone}</span>
           </div>
-          {/* <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4">
             <span className="text-base text-gray-400">Giới tính </span>
-            <span className="text-base font-bold">Nữ </span>
-          </div> */}
+            <span className="text-base font-bold">{data?.data.gender} </span>
+          </div>
           <div className="flex items-center justify-between mb-4">
             <div className="text-base text-gray-400">
               <div>Ngày sinh (ngày/tháng/năm)</div>
@@ -118,7 +119,7 @@ const Profile = () => {
           <p className="font-bold text-5xl mb-10">Thông tin đăng nhập </p>
           <div className="flex items-center justify-between mb-4">
             <span className="text-base text-gray-400">Email</span>
-            <span className="text-base font-bold">ulatroi@gmail.com</span>
+            <span className="text-base font-bold">{data?.data.email ?? "Chưa cập nhật"}</span>
           </div>
           <div className="flex items-center justify-between mb-4">
             <span className="text-base text-gray-400">Mật khẩu </span>

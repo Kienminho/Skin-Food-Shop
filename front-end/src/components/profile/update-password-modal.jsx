@@ -29,6 +29,8 @@ const UpdatePasswordModal = ({ open, setOpen, onSubmit }) => {
       open={open}
       onOk={handleOk}
       onCancel={handleCancel}
+      okText="Cập nhật"
+      cancelText="Huỷ"
     >
       <Form form={form} layout="vertical" size="large">
         <Form.Item

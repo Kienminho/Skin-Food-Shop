@@ -29,10 +29,11 @@ const SignIn = () => {
         navigate("/");
       },
 
-      onError() {
+      onError(error) {
+        const message = error.response.data.message;
         messageApi.open({
           type: "error",
-          content: "Đăng nhập thật bại",
+          content: message,
         });
       },
     });
@@ -44,8 +45,9 @@ const SignIn = () => {
         messageApi.success("Đăng ký tài khoản thành công");
         signUpForm.resetFields();
       },
-      onError() {
-        messageApi.error("Đăng ký tài khoản thất bại");
+      onError(error) {
+        const message = error.response.data.message;
+        messageApi.error(message);
       },
     });
   };

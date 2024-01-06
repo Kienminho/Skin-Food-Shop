@@ -73,8 +73,22 @@ const handleLogin = async (req, res) => {
 
 const handleRegister = async (req, res) => {
   const { phone, password } = req.body;
-  const existUser = await User.findOne({ phone: phone, isDeleted: false });
-  //check user exist
+  const inputType = checkInput(phone);
+  if (inputType === "unknown") {
+    return res
+      .status(400)
+      .json(
+        Utils.createResponseModel(
+          400,
+          `Vui lòng nhập số điện thoại hoặc email.`
+        )
+      );
+  }
+  //check user exist by phone or email
+  const existUser = await User.findOne({
+    $or: [{ phone: phone }, { email: phone }],
+    isDeleted: false,
+  });
   if (existUser != null) {
     return res
       .status(400)
@@ -90,11 +104,19 @@ const handleRegister = async (req, res) => {
     const hashPassword = Utils.hashPassword(password);
     const number = await User.countDocuments();
     // Tạo một user mới
-    const user = await User.create({
-      phone: phone,
+    const user = new User({
       password: hashPassword,
-      email: `user_${number}@gmail.com`,
     });
+    if (inputType === "email") {
+      user.email = phone;
+      user.phone = `Chưa cập nhật`;
+    }
+    if (inputType === "phone") {
+      user.phone = phone;
+      user.email = `user_${number}@gmail.com`;
+    }
+
+    await user.save();
     return res.json(Utils.createSuccessResponseModel(1, user._id));
   } catch (error) {
     console.log("userController-Line 31: " + error.message);
@@ -106,12 +128,24 @@ const handleRegister = async (req, res) => {
 
 const updateInfoUser = async (req, res) => {
   const user = await User.findById(req.user.id);
+  const checkUser = await User.findOne({ phone: req.body.phone });
+  if (checkUser) {
+    return res
+      .status(400)
+      .json(
+        Utils.createResponseModel(
+          400,
+          `Số điện thoại là ${req.body.phone} đã tồn tại.`
+        )
+      );
+  }
 
   const newProfile = { ...user.toObject(), ...req.body };
   //using newProfile to update user
   user.email = newProfile.email;
   user.name = newProfile.name;
   user.birthday = newProfile.birthday;
+  user.gender = newProfile.gender;
   user.address = newProfile.address;
   user.phone = newProfile.phone;
   user.updated_at = new Date();
@@ -255,6 +289,19 @@ const deleteUser = async (req, res) => {
     return res.status(500).json(Utils.createErrorResponseModel(error.message));
   }
 };
+
+function checkInput(input) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^(^\+251|^251|^0)?(9|7)\d{8}$/; // This is a very basic international phone number regex
+
+  if (emailRegex.test(input)) {
+    return "email";
+  } else if (phoneRegex.test(input)) {
+    return "phone";
+  } else {
+    return "unknown";
+  }
+}
 
 module.exports = {
   handleLogin: handleLogin,
