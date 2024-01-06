@@ -35,7 +35,7 @@ const CardItem = ({ item } = {}) => {
 
   return (
     <div
-      className=" overflow-hidden cursor-pointer shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl md:max-w-[150px] lg:max-w-[250px]"
+      className=" overflow-hidden border border-primary-color bg-white cursor-pointer shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl md:max-w-[150px] lg:max-w-[250px]"
       onClick={() => navigate(`/products/${item?._id}`)}
     >
       {context}
