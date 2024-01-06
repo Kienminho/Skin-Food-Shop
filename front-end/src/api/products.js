@@ -11,8 +11,12 @@ export const productsApi = {
     categoryName,
     { pageSize = 10, pageIndex = 1, price } = {}
   ) {
+    let filterCategory = "";
+    if (categoryName) {
+      filterCategory = `categoryName=${categoryName}&`;
+    }
     return axiosClient.get(
-      `/product/get-products-by-category?categoryName=${categoryName}&${price}&pageSize=${pageSize}&pageIndex=${pageIndex}`
+      `/product/get-products-by-category?${filterCategory}${price}&pageSize=${pageSize}&pageIndex=${pageIndex}`
     );
   },
   getProductRelated(productId) {
